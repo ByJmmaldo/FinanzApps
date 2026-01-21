@@ -91,7 +91,7 @@
             border-bottom: 0.5px solid rgba(0,0,0,0.1);
         }
         
-        .btn-back {
+        .btn-action {
             color: var(--blue); font-size: 17px; font-weight: 500; border: none; background: none;
             display: flex; align-items: center; gap: 5px; cursor: pointer; padding: 10px 0;
         }
@@ -159,6 +159,11 @@
         .form-input { flex: 1; border: none; text-align: right; font-size: 17px; outline: none; background: transparent; color: var(--blue); }
         .btn-save { width: 100%; padding: 14px; border-radius: 12px; border: none; background: var(--accent); color: white; font-size: 17px; font-weight: 600; cursor: pointer; }
 
+        /* SETTINGS VIEW */
+        .settings-section-title { margin: 20px 20px 5px 20px; font-size: 13px; color: var(--subtext); text-transform: uppercase; }
+        .btn-delete-cat { color: var(--red); background: none; border: none; font-size: 16px; cursor: pointer; }
+        .btn-add-cat { width: 100%; padding: 12px; color: var(--blue); background: white; border: none; font-size: 16px; font-weight: 500; cursor: pointer; border-radius: 12px; margin-top: 10px; }
+
         #charts-wrapper { display: none; padding: 20px; background: white; margin: 0 20px; border-radius: 12px; }
         .loader { border: 2px solid #ccc; border-top: 2px solid #666; border-radius: 50%; width: 20px; height: 20px; animation: spin 1s linear infinite; margin: 20px auto; }
         @keyframes spin { 100% { transform: rotate(360deg); } }
@@ -170,7 +175,7 @@
     <div id="view-selector" class="view active">
         <div class="ios-header-lg">
             <h1 class="title-lg">Cuentas</h1>
-            <div class="subtitle">Hola, Jose M.</div>
+            <div class="subtitle">Finanzas Personales</div>
         </div>
 
         <div class="ios-group">
@@ -187,19 +192,22 @@
                 <div class="row-icon" style="background: #5856D6;"><i class="fas fa-users"></i></div>
                 <div class="row-text">
                     <div class="row-title">Común</div>
-                    <div class="row-sub">Compartido con Sandra</div>
+                    <div class="row-sub">Compartido</div>
                 </div>
                 <i class="fas fa-chevron-right" style="color: #C7C7CC;"></i>
             </div>
         </div>
+        <div style="text-align:center; margin-top:30px; font-size:12px; color:#ccc;">ID: <span id="user-id-display">...</span></div>
     </div>
 
     <div id="view-dashboard" class="view">
         <div class="nav-bar">
-            <button class="btn-back" onclick="app.goBack()">
-                <i class="fas fa-chevron-left" style="font-size: 20px;"></i> Cuentas
+            <button class="btn-action" onclick="app.goBack()">
+                <i class="fas fa-chevron-left"></i> Cuentas
             </button>
-            <i class="fas fa-bell" style="color: var(--blue); font-size: 20px;" onclick="alert('Sin notificaciones')"></i>
+            <button class="btn-action" onclick="app.openSettings()">
+                <i class="fas fa-cog" style="font-size: 22px;"></i>
+            </button>
         </div>
 
         <div class="balance-container">
@@ -224,6 +232,27 @@
         </div>
 
         <button class="fab" onclick="app.openModal()"><i class="fas fa-plus"></i></button>
+    </div>
+
+    <div id="view-settings" class="view">
+        <div class="nav-bar">
+            <button class="btn-action" onclick="app.closeSettings()">OK</button>
+            <div style="font-weight:600;">Editar Categorías</div>
+            <div style="width:40px;"></div>
+        </div>
+        <div style="padding: 20px;">
+            <div class="settings-section-title">Ingresos</div>
+            <div class="ios-group" id="list-cats-in"></div>
+            <button class="btn-add-cat" onclick="app.addCategory('ingresos')">+ Añadir Ingreso</button>
+
+            <div class="settings-section-title" style="margin-top:30px;">Gastos</div>
+            <div class="ios-group" id="list-cats-out"></div>
+            <button class="btn-add-cat" onclick="app.addCategory('gastos')">+ Añadir Gasto</button>
+            
+            <div style="margin-top:30px; text-align:center; font-size:13px; color:#999;">
+                Tus categorías se guardan en este dispositivo.
+            </div>
+        </div>
     </div>
 
     <div id="modal" class="modal-mask" onclick="app.closeModal(event)">
@@ -259,7 +288,6 @@
     </div>
 
     <script>
-        // CONFIGURACIÓN FIREBASE
         const firebaseConfig = {
             apiKey: "AIzaSyDriSSF-UpUlJS2rHcjZ7N0dAsPFpPYgm4",
             authDomain: "finanzapps-e2edc.firebaseapp.com",
@@ -275,76 +303,87 @@
             db = firebase.firestore();
         } catch (e) { console.error("Error Firebase", e); }
 
+        // --- CATEGORÍAS BASE (POR DEFECTO) ---
+        const defaultCats = {
+            personal: {
+                ingresos: { nomina: '💰 Nómina', extra: '💵 Ingreso Extra', bitcoin_val: '₿ Bitcoin (Valor)', mapfre: '🛡️ Plan Pensiones' },
+                gastos: { aporte_comun: '🏠 Aporte Común', ahorro: '🐷 Ahorro', gasto_revolut: '💳 Gasto Revolut', bitcoin_inv: '₿ Bitcoin (Inversión)', gasolina: '⛽ Gasolina', varios: '🛒 Varios' }
+            },
+            comun: {
+                ingresos: { aporte_jose: '👨🏻 Aporte Jose', aporte_sandra: '👩🏼 Aporte Sandra', extra: '💵 Extra' },
+                gastos: { hipoteca: '🏠 Hipoteca', luz: '⚡ Luz/Agua', comida: '🛒 Supermercado', internet: '📱 Internet', otros: '💸 Otros' }
+            }
+        };
+
         const app = {
             state: {
-                userID: 'jose_m_id_unico',
+                userID: null,
                 account: 'personal',
                 unsub: null,
                 balance: 0,
-                transactions: []
+                transactions: [],
+                cats: null // Se cargará dinámicamente
             },
 
-            // --- CATEGORÍAS ACTUALIZADAS (V21) ---
-            cats: {
-                personal: {
-                    ingresos: { 
-                        nomina: '💰 Nómina', 
-                        extra: '💵 Ingreso Extra',
-                        bitcoin_val: '₿ Bitcoin (Valor/Retorno)',
-                        mapfre: '🛡️ Plan Pensiones Mapfre'
-                    },
-                    gastos: { 
-                        aporte_comun: '🏠 Aporte a Común', 
-                        ahorro_revolut: '🐷 Ahorro Revolut', 
-                        gasto_revolut: '💳 Gasto Revolut', 
-                        bitcoin_inv: '₿ Bitcoin (Inversión)', 
-                        cti: '💳 Tarjeta CTI', 
-                        gasolina: '⛽ Gasolina', 
-                        crossfit: '🏋️ Crossfit', 
-                        suscripciones: '📺 Suscripciones', 
-                        varios: '🛒 Varios' 
-                    }
-                },
-                comun: {
-                    ingresos: { 
-                        aporte_jose: '👨🏻 Aporte Jose M.', 
-                        aporte_sandra: '👩🏼 Aporte Sandra', 
-                        aporte_extra: '💵 Aporte Extra' 
-                    },
-                    gastos: { 
-                        hipoteca: '🏠 Hipoteca', 
-                        credito_coche: '🚗 Crédito Coche', 
-                        luz: '⚡ Luz', 
-                        agua: '💧 Agua', 
-                        gas: '🔥 Gas', 
-                        telefonia: '📱 Internet/Tlf', 
-                        comedor: '🍽️ Comedor Colegio', 
-                        comida: '🛒 Supermercado', 
-                        suscripciones: '📺 Suscripciones', 
-                        gastos_extra: '💸 Gastos Extra' 
-                    }
+            init: () => {
+                // 1. GESTIÓN DE ID (MULTIUSUARIO)
+                let storedID = localStorage.getItem('app_uid');
+                if (!storedID) {
+                    // Generar ID único para nuevos usuarios
+                    storedID = 'user_' + Math.random().toString(36).substr(2, 9);
+                    localStorage.setItem('app_uid', storedID);
+                }
+                
+                // --- TRUCO PARA TI (JOSE): SI ES TU NAVEGADOR, MANTÉN TU ID VIEJO ---
+                // Si quieres mantener tus datos viejos en tu móvil, descomenta esto una vez y recarga:
+                // localStorage.setItem('app_uid', 'jose_m_id_unico'); 
+                
+                app.state.userID = storedID;
+                document.getElementById('user-id-display').innerText = storedID;
+
+                // 2. CARGAR CATEGORÍAS
+                app.loadCats();
+
+                // 3. LISTENERS
+                document.getElementById('form-tx').addEventListener('submit', app.save);
+            },
+
+            // --- GESTIÓN DE CATEGORÍAS ---
+            loadCats: () => {
+                const storedCats = localStorage.getItem('my_categories');
+                if (storedCats) {
+                    app.state.cats = JSON.parse(storedCats);
+                } else {
+                    app.state.cats = JSON.parse(JSON.stringify(defaultCats)); // Copia limpia
                 }
             },
-            
-            icons: {
-                nomina: 'fa-money-bill-wave', extra: 'fa-hand-holding-usd', 
-                bitcoin_val: 'fa-bitcoin', mapfre: 'fa-shield-alt',
-                aporte_comun: 'fa-exchange-alt', ahorro_revolut: 'fa-piggy-bank', 
-                gasto_revolut: 'fa-credit-card', bitcoin_inv: 'fa-bitcoin', 
-                cti: 'fa-id-card', gasolina: 'fa-gas-pump', 
-                crossfit: 'fa-dumbbell', varios: 'fa-shopping-cart', 
-                aporte_jose: 'fa-user-plus', aporte_sandra: 'fa-user-plus', 
-                aporte_extra: 'fa-plus-circle', hipoteca: 'fa-home', 
-                credito_coche: 'fa-car', luz: 'fa-bolt', agua: 'fa-tint', 
-                gas: 'fa-fire', telefonia: 'fa-wifi', comedor: 'fa-utensils', 
-                comida: 'fa-shopping-basket', suscripciones: 'fa-tv', gastos_extra: 'fa-receipt'
+
+            saveCats: () => {
+                localStorage.setItem('my_categories', JSON.stringify(app.state.cats));
+                app.loadCats(); // Recargar en memoria
+                app.renderSettings(); // Refrescar UI si está abierta
+            },
+
+            addCategory: (type) => { // type = 'ingresos' or 'gastos'
+                const name = prompt("Nombre de la nueva categoría (puedes usar emojis):");
+                if (name && name.trim() !== "") {
+                    const key = 'cat_' + Date.now();
+                    app.state.cats[app.state.account][type][key] = name;
+                    app.saveCats();
+                }
+            },
+
+            delCategory: (type, key) => {
+                if(confirm("¿Borrar esta categoría?")) {
+                    delete app.state.cats[app.state.account][type][key];
+                    app.saveCats();
+                }
             },
 
             // --- NAVEGACIÓN ---
             selectAccount: (type) => {
                 app.state.account = type;
                 const root = document.documentElement;
-                
                 if(type === 'personal') root.style.setProperty('--accent', '#007AFF');
                 else root.style.setProperty('--accent', '#5856D6');
 
@@ -353,7 +392,6 @@
 
                 document.getElementById('view-selector').classList.remove('active');
                 document.getElementById('view-dashboard').classList.add('active');
-                
                 app.toggleTab('list');
                 app.loadData();
             },
@@ -362,6 +400,38 @@
                 if(app.state.unsub) app.state.unsub();
                 document.getElementById('view-dashboard').classList.remove('active');
                 document.getElementById('view-selector').classList.add('active');
+            },
+
+            openSettings: () => {
+                app.renderSettings();
+                document.getElementById('view-settings').classList.add('active');
+            },
+            closeSettings: () => {
+                document.getElementById('view-settings').classList.remove('active');
+            },
+
+            renderSettings: () => {
+                const acc = app.state.account;
+                const listIn = document.getElementById('list-cats-in');
+                const listOut = document.getElementById('list-cats-out');
+                listIn.innerHTML = ''; listOut.innerHTML = '';
+
+                // Render Ingresos
+                for (const [key, val] of Object.entries(app.state.cats[acc].ingresos)) {
+                    listIn.innerHTML += `
+                        <div class="ios-row">
+                            <div style="flex:1;">${val}</div>
+                            <button class="btn-delete-cat" onclick="app.delCategory('ingresos', '${key}')"><i class="fas fa-trash"></i></button>
+                        </div>`;
+                }
+                // Render Gastos
+                for (const [key, val] of Object.entries(app.state.cats[acc].gastos)) {
+                    listOut.innerHTML += `
+                        <div class="ios-row">
+                            <div style="flex:1;">${val}</div>
+                            <button class="btn-delete-cat" onclick="app.delCategory('gastos', '${key}')"><i class="fas fa-trash"></i></button>
+                        </div>`;
+                }
             },
 
             toggleTab: (mode) => {
@@ -380,21 +450,20 @@
                 }
             },
 
-            // --- LÓGICA DE DATOS ---
+            // --- DATA ---
             isExpense: (catKey) => {
-                return !!app.cats[app.state.account].gastos[catKey];
+                return !!app.state.cats[app.state.account].gastos[catKey];
             },
 
             getName: (catKey) => {
-                const acc = app.cats[app.state.account];
-                if(acc.ingresos[catKey]) return acc.ingresos[catKey];
-                if(acc.gastos[catKey]) return acc.gastos[catKey];
-                return catKey;
+                const currentCats = app.state.cats[app.state.account];
+                if(currentCats.ingresos[catKey]) return currentCats.ingresos[catKey];
+                if(currentCats.gastos[catKey]) return currentCats.gastos[catKey];
+                return "Desconocido"; // Si se borró la categoría
             },
 
             loadData: () => {
                 if(!db) return;
-                
                 const listEl = document.getElementById('wrapper-list');
                 const balEl = document.getElementById('total-balance');
                 listEl.innerHTML = '<div class="empty-state"><div class="loader"></div></div>';
@@ -403,7 +472,7 @@
                 if(app.state.account === 'personal') {
                     q = q.where("type", "==", "personal").where("uid", "==", app.state.userID);
                 } else {
-                    q = q.where("type", "==", "comun");
+                    q = q.where("type", "==", "comun"); // Común sigue siendo compartido
                 }
 
                 app.state.unsub = q.onSnapshot((snap) => {
@@ -422,18 +491,17 @@
                     app.state.transactions = arr;
 
                     arr.forEach(t => {
-                        // Calcular saldo
-                        if(app.isExpense(t.category)) total -= t.amount; else total += t.amount;
+                        const expense = app.isExpense(t.category);
+                        if(expense) total -= t.amount; else total += t.amount;
 
-                        const icon = app.icons[t.category] || 'fa-tag';
-                        const colorClass = app.isExpense(t.category) ? 'red' : 'green';
-                        const sign = app.isExpense(t.category) ? '-' : '+';
+                        const colorClass = expense ? 'red' : 'green';
+                        const sign = expense ? '-' : '+';
                         const name = app.getName(t.category);
 
                         const html = `
                         <div class="tx-row" onclick="app.askDelete('${t.id}')">
                             <div style="display:flex; align-items:center;">
-                                <div class="tx-icon"><i class="fas ${icon}"></i></div>
+                                <div class="tx-icon"><i class="fas fa-tag"></i></div>
                                 <div>
                                     <div style="font-weight:600; font-size:16px;">${name}</div>
                                     <div style="font-size:13px; color:#8E8E93;">${t.concept || t.date}</div>
@@ -464,7 +532,7 @@
                 }).then(() => {
                     app.forceClose();
                     e.target.reset();
-                }).catch(err => alert("Error guardando: " + err.message));
+                }).catch(err => alert("Error: " + err.message));
             },
 
             askDelete: (id) => { if(confirm("¿Eliminar?")) db.collection("transactions").doc(id).delete(); },
@@ -516,7 +584,7 @@
             fillCats: () => {
                 const s = document.getElementById('inp-cat');
                 s.innerHTML = '<option disabled selected>Seleccionar</option>';
-                const currentCats = app.cats[app.state.account];
+                const currentCats = app.state.cats[app.state.account];
                 
                 let g1 = document.createElement('optgroup'); g1.label="INGRESOS";
                 for(let [k,v] of Object.entries(currentCats.ingresos)) { 
@@ -533,7 +601,7 @@
             formatMoney: (n) => new Intl.NumberFormat('es-ES', {style:'currency', currency:'EUR'}).format(n)
         };
 
-        document.getElementById('form-tx').addEventListener('submit', app.save);
+        window.onload = app.init;
     </script>
 </body>
 </html>
