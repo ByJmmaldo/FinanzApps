@@ -3,7 +3,6 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="Finanzapps">
@@ -21,125 +20,56 @@
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
 
     <style>
-        /* --- ESTILOS VISUALES (iOS DESIGN) --- */
         :root {
-            --ios-bg: #F2F2F7;
-            --ios-card: #FFFFFF;
-            --ios-text: #000000;
-            --ios-text-secondary: #8E8E93;
-            --ios-blue: #007AFF;
-            --ios-red: #FF3B30;
-            --ios-green: #34C759;
-            --ios-separator: #C6C6C8;
-            --brand-personal: #007AFF;
-            --brand-sandra: #FF2D55;
-            --brand-common: #5856D6;
-            --accent-color: var(--brand-personal);
-            --radius: 12px;
+            --ios-bg: #F2F2F7; --ios-card: #FFFFFF; --ios-text: #000000; --ios-text-secondary: #8E8E93;
+            --ios-blue: #007AFF; --ios-red: #FF3B30; --ios-green: #34C759; --ios-separator: #C6C6C8;
+            --brand-personal: #007AFF; --brand-sandra: #FF2D55; --brand-common: #5856D6;
+            --accent-color: var(--brand-personal); --radius: 12px;
         }
-
         * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; }
+        body { background-color: var(--ios-bg); margin: 0; padding: 0; color: var(--ios-text); height: 100vh; overflow: hidden; padding-top: env(safe-area-inset-top); padding-bottom: env(safe-area-inset-bottom); }
         
-        body {
-            background-color: var(--ios-bg); margin: 0; padding: 0;
-            color: var(--ios-text); height: 100vh; overflow: hidden;
-            padding-top: env(safe-area-inset-top); padding-bottom: env(safe-area-inset-bottom);
-        }
-
-        .view {
-            display: none; width: 100%; height: 100%; overflow-y: auto;
-            position: absolute; top: 0; left: 0; background: var(--ios-bg);
-            animation: fadeIn 0.2s ease-in-out;
-        }
+        .view { display: none; width: 100%; height: 100%; overflow-y: auto; position: absolute; top: 0; left: 0; background: var(--ios-bg); animation: fadeIn 0.2s ease-in-out; }
         .view.active { display: block; }
         @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
 
         /* LOGIN */
-        #view-login {
-            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
-            display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 9999;
-        }
-        .app-icon {
-            width: 80px; height: 80px; background: white; border-radius: 18px;
-            display: flex; align-items: center; justify-content: center;
-            font-size: 40px; color: #333; box-shadow: 0 10px 20px rgba(0,0,0,0.1); margin-bottom: 20px;
-        }
-        .ios-input {
-            background: white; border: 1px solid #d1d1d6; border-radius: 10px;
-            padding: 12px; width: 280px; font-size: 16px; margin-bottom: 15px; outline: none;
-        }
-        .ios-btn {
-            background: var(--ios-blue); color: white; border: none; padding: 12px;
-            width: 280px; border-radius: 10px; font-size: 17px; font-weight: 600; cursor: pointer;
-        }
-        .auth-link { margin-top: 20px; color: var(--ios-blue); font-size: 14px; cursor: pointer; }
+        #view-login { background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%); display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 9999; }
+        .app-icon { width: 80px; height: 80px; background: white; border-radius: 18px; display: flex; align-items: center; justify-content: center; font-size: 40px; color: #333; box-shadow: 0 10px 20px rgba(0,0,0,0.1); margin-bottom: 20px; }
+        .ios-input { background: white; border: 1px solid #d1d1d6; border-radius: 10px; padding: 12px; width: 280px; font-size: 16px; margin-bottom: 15px; outline: none; }
+        .ios-btn { background: var(--ios-blue); color: white; border: none; padding: 12px; width: 280px; border-radius: 10px; font-size: 17px; font-weight: 600; cursor: pointer; }
+        .auth-link { margin-top: 20px; color: var(--ios-blue); font-size: 14px; cursor: pointer; text-decoration: underline; padding: 10px; }
 
-        /* HEADER & DASHBOARD */
-        .ios-header {
-            padding: 20px 20px 10px 20px; background: var(--ios-bg);
-            position: sticky; top: 0; z-index: 100;
-        }
+        /* HEADER */
+        .ios-header { padding: 20px 20px 10px 20px; background: var(--ios-bg); position: sticky; top: 0; z-index: 100; }
         .header-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
-        .back-btn { color: var(--ios-blue); font-size: 17px; background: none; border: none; padding: 0; display: flex; align-items: center; gap: 5px;}
+        .back-btn { color: var(--ios-blue); font-size: 17px; background: none; border: none; padding: 0; display: flex; align-items: center; gap: 5px; cursor: pointer;}
         .header-title { font-size: 34px; font-weight: 800; margin: 0; letter-spacing: -0.5px; }
         .header-subtitle { font-size: 13px; color: var(--ios-text-secondary); text-transform: uppercase; font-weight: 600; margin-top: 10px;}
         .balance-amount { font-size: 32px; font-weight: 700; cursor: pointer;}
 
-        /* COMPONENTES */
-        .ios-segment {
-            background: #E5E5EA; border-radius: 9px; padding: 2px;
-            display: flex; margin: 15px 20px;
-        }
-        .segment-btn {
-            flex: 1; border: none; background: transparent; padding: 6px;
-            border-radius: 7px; font-size: 13px; font-weight: 600; transition: all 0.2s;
-        }
+        /* UI ELEMENTS */
+        .ios-segment { background: #E5E5EA; border-radius: 9px; padding: 2px; display: flex; margin: 15px 20px; }
+        .segment-btn { flex: 1; border: none; background: transparent; padding: 6px; border-radius: 7px; font-size: 13px; font-weight: 600; transition: all 0.2s; cursor: pointer; }
         .segment-btn.active { background: white; box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
-
         .ios-list { margin: 0 20px 100px 20px; background: white; border-radius: 12px; overflow: hidden; }
-        .list-item {
-            display: flex; align-items: center; justify-content: space-between;
-            padding: 12px 16px; border-bottom: 1px solid var(--ios-separator); cursor: pointer;
-        }
+        .list-item { display: flex; align-items: center; justify-content: space-between; padding: 12px 16px; border-bottom: 1px solid var(--ios-separator); cursor: pointer; }
         .list-item:active { background: #F2F2F7; }
         .list-item:last-child { border-bottom: none; }
-
-        .item-icon {
-            width: 36px; height: 36px; border-radius: 8px; background: var(--accent-color);
-            display: flex; align-items: center; justify-content: center; color: white; font-size: 16px; margin-right: 12px;
-        }
+        .item-icon { width: 36px; height: 36px; border-radius: 8px; background: var(--accent-color); display: flex; align-items: center; justify-content: center; color: white; font-size: 16px; margin-right: 12px; }
         .item-title { font-size: 16px; font-weight: 600; }
         .item-sub { font-size: 13px; color: var(--ios-text-secondary); }
         .item-amount { font-size: 16px; font-weight: 600; }
         .t-red { color: var(--ios-text); } .t-green { color: var(--ios-green); }
-
-        /* SELECTOR CUENTAS */
         .account-selector-list { margin: 20px; border-radius: 12px; overflow: hidden; }
-        .account-row {
-            background: white; padding: 20px; display: flex; align-items: center;
-            border-bottom: 1px solid var(--ios-separator); cursor: pointer;
-        }
-        .account-row:active { background: #E5E5EA; }
-
-        .fab {
-            position: fixed; bottom: 40px; right: 20px; width: 56px; height: 56px; border-radius: 50%;
-            background: var(--accent-color); color: white; border: none; box-shadow: 0 4px 15px rgba(0,0,0,0.3);
-            font-size: 24px; display: flex; align-items: center; justify-content: center; z-index: 200;
-        }
+        .account-row { background: white; padding: 20px; display: flex; align-items: center; border-bottom: 1px solid var(--ios-separator); cursor: pointer; }
+        .fab { position: fixed; bottom: 40px; right: 20px; width: 56px; height: 56px; border-radius: 50%; background: var(--accent-color); color: white; border: none; box-shadow: 0 4px 15px rgba(0,0,0,0.3); font-size: 24px; display: flex; align-items: center; justify-content: center; z-index: 200; cursor: pointer;}
 
         /* MODAL */
-        .sheet-overlay {
-            display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0,0,0,0.4); z-index: 1000; backdrop-filter: blur(2px);
-        }
-        .sheet-content {
-            position: fixed; bottom: 0; left: 0; width: 100%; background: #F2F2F7;
-            border-top-left-radius: 15px; border-top-right-radius: 15px; padding: 20px; padding-bottom: 50px;
-            transform: translateY(100%); transition: transform 0.3s cubic-bezier(0.2, 0.8, 0.2, 1);
-        }
+        .sheet-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.4); z-index: 1000; backdrop-filter: blur(2px); }
+        .sheet-content { position: fixed; bottom: 0; left: 0; width: 100%; background: #F2F2F7; border-top-left-radius: 15px; border-top-right-radius: 15px; padding: 20px; padding-bottom: 50px; transform: translateY(100%); transition: transform 0.3s cubic-bezier(0.2, 0.8, 0.2, 1); }
         .sheet-open .sheet-content { transform: translateY(0); }
         .sheet-handle { width: 40px; height: 5px; background: #C5C5C7; border-radius: 3px; margin: 0 auto 20px auto; }
-
         .input-group-ios { background: white; border-radius: 10px; overflow: hidden; margin-bottom: 20px; }
         .input-row { display: flex; align-items: center; padding: 0 15px; border-bottom: 1px solid #E5E5EA; height: 50px; }
         .input-row:last-child { border-bottom: none; }
@@ -148,7 +78,6 @@
         
         .loader { width: 20px; height: 20px; border: 2px solid #ccc; border-top-color: #333; border-radius: 50%; animation: spin 1s linear infinite; margin: 0 auto; }
         @keyframes spin { 100% { transform: rotate(360deg); } }
-        
         #charts-container { padding: 20px; background: white; border-radius: 12px; margin: 0 20px; display: none;}
         .empty-state { text-align: center; color: #8E8E93; margin-top: 40px; }
     </style>
@@ -158,17 +87,17 @@
     <div id="view-login" class="view active" style="display: flex;">
         <div class="app-icon"><i class="fas fa-wallet"></i></div>
         <h2 style="margin-bottom: 5px;">Finanzapps</h2>
-        <p style="color: #666; margin-bottom: 30px;">Edición Universal</p>
+        <p style="color: #666; margin-bottom: 30px;">V11.0 Universal</p>
         
         <form id="auth-form" style="display:flex; flex-direction:column; align-items:center;">
             <input type="email" id="email" class="ios-input" placeholder="Email" required>
-            <input type="password" id="password" class="ios-input" placeholder="Contraseña" required>
+            <input type="password" id="password" class="ios-input" placeholder="Contraseña (mín 6 car.)" required>
             <button type="submit" class="ios-btn" id="btn-auth-action">
-                <span id="btn-text">Entrar</span>
+                <span id="btn-text">Iniciar Sesión</span>
                 <div class="loader" id="auth-loader" style="display:none; border-color:rgba(255,255,255,0.5); border-top-color:white;"></div>
             </button>
             <div class="auth-link" onclick="app.toggleAuthMode()">
-                <span id="toggle-text">Crear cuenta nueva</span>
+                <span id="toggle-text">¿No tienes cuenta? Regístrate</span>
             </div>
         </form>
     </div>
@@ -236,7 +165,7 @@
     </div>
 
     <script>
-        // 1. TU CONFIGURACIÓN FIREBASE
+        // CONFIGURACIÓN FIREBASE (Tus claves reales)
         const firebaseConfig = {
             apiKey: "AIzaSyDriSSF-UpUlJS2rHcjZ7N0dAsPFpPYgm4",
             authDomain: "finanzapps-e2edc.firebaseapp.com",
@@ -246,21 +175,15 @@
             appId: "1:845819455154:web:72fcc69e42209dcd970bab"
         };
 
-        // 2. INICIALIZAR FIREBASE (COMPAT)
+        // INICIALIZACIÓN COMPATIBLE (IMPORTANTE PARA LOCALHOST/FILE)
         firebase.initializeApp(firebaseConfig);
         const db = firebase.firestore();
         const auth = firebase.auth();
         let myChart = null;
 
-        // 3. APP PRINCIPAL
         const app = {
             state: {
-                user: null,
-                currentAccount: 'personal',
-                isRegistering: false,
-                unsubscribe: null,
-                initialBalance: 0,
-                transactions: []
+                user: null, currentAccount: 'personal', isRegistering: false, unsubscribe: null, initialBalance: 0, transactions: []
             },
 
             init: () => {
@@ -277,10 +200,9 @@
                 document.getElementById('transaction-form').addEventListener('submit', app.saveData);
             },
 
-            // --- AUTENTICACIÓN ---
+            // LOGIN
             toggleAuthMode: () => {
-                const s = app.state;
-                s.isRegistering = !s.isRegistering;
+                const s = app.state; s.isRegistering = !s.isRegistering;
                 document.getElementById('btn-text').innerText = s.isRegistering ? "Registrarse" : "Iniciar Sesión";
                 document.getElementById('toggle-text').innerText = s.isRegistering ? "¿Ya tienes cuenta? Inicia Sesión" : "¿No tienes cuenta? Regístrate";
             },
@@ -294,12 +216,18 @@
                 
                 loader.style.display = 'block'; btnTxt.style.display = 'none';
                 
+                // Intentamos crear o entrar
                 const action = app.state.isRegistering 
                     ? auth.createUserWithEmailAndPassword(email, pass)
                     : auth.signInWithEmailAndPassword(email, pass);
 
                 action.catch(err => {
-                    alert("Error: " + err.message);
+                    let msg = err.message;
+                    if(err.code === 'auth/email-already-in-use') msg = "¡Este email ya existe! Prueba a INICIAR SESIÓN.";
+                    if(err.code === 'auth/wrong-password') msg = "Contraseña incorrecta.";
+                    if(err.code === 'auth/user-not-found') msg = "Usuario no encontrado. Regístrate primero.";
+                    
+                    alert("⚠️ Error: " + msg);
                     loader.style.display = 'none'; btnTxt.style.display = 'block';
                 });
             },
@@ -309,7 +237,7 @@
                 if(app.state.unsubscribe) app.state.unsubscribe();
             },
 
-            // --- NAVEGACIÓN ---
+            // NAVEGACIÓN
             changeView: (id) => {
                 document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
                 document.getElementById(id).classList.add('active');
@@ -319,7 +247,7 @@
                 app.changeView('view-selector');
             },
 
-            // --- CUENTAS ---
+            // LOGICA CUENTAS
             selectAccount: (type) => {
                 app.state.currentAccount = type;
                 const root = document.documentElement;
@@ -334,13 +262,9 @@
                     document.getElementById('lbl-account-name').innerText = "Cuentas";
                 }
 
-                // Balance Local
                 const key = `bal_${app.state.user.uid}_${type}`;
                 app.state.initialBalance = parseFloat(localStorage.getItem(key)) || 0;
-
-                app.toggleView('list');
-                app.changeView('view-dashboard');
-                app.listenToData();
+                app.toggleView('list'); app.changeView('view-dashboard'); app.listenToData();
             },
 
             toggleView: (mode) => {
@@ -359,7 +283,6 @@
                 }
             },
 
-            // --- BASE DE DATOS ---
             listenToData: () => {
                 const listEl = document.getElementById('container-list');
                 const totalEl = document.getElementById('total-balance');
@@ -383,9 +306,7 @@
                         return;
                     }
 
-                    snapshot.forEach(doc => {
-                        const d = doc.data(); d.id = doc.id; txs.push(d);
-                    });
+                    snapshot.forEach(doc => { const d = doc.data(); d.id = doc.id; txs.push(d); });
                     
                     // Ordenar localmente
                     txs.sort((a,b) => new Date(b.date) - new Date(a.date));
@@ -417,7 +338,6 @@
                         </div>`;
                         listEl.insertAdjacentHTML('beforeend', html);
                     });
-                    
                     totalEl.innerText = new Intl.NumberFormat('es-ES', {style:'currency', currency:'EUR'}).format(balance);
                     if(document.getElementById('container-chart').style.display === 'block') app.renderChart();
                 });
@@ -436,17 +356,11 @@
                     type: app.state.currentAccount,
                     amount: amt, category: cat, concept: concept, date: date,
                     timestamp: Date.now()
-                }).then(() => {
-                    app.forceCloseModal();
-                    e.target.reset();
-                }).catch(err => alert(err.message));
+                }).then(() => { app.forceCloseModal(); e.target.reset(); })
+                .catch(err => alert("Error: " + err.message));
             },
 
-            askDelete: (id) => {
-                if(confirm("¿Eliminar movimiento?")) {
-                    db.collection("transactions").doc(id).delete();
-                }
-            },
+            askDelete: (id) => { if(confirm("¿Eliminar movimiento?")) db.collection("transactions").doc(id).delete(); },
 
             editInitialBalance: () => {
                 const current = app.state.initialBalance;
@@ -455,7 +369,7 @@
                     const key = `bal_${app.state.user.uid}_${app.state.currentAccount}`;
                     localStorage.setItem(key, val);
                     app.state.initialBalance = parseFloat(val);
-                    app.listenToData(); // Recalcular
+                    app.listenToData();
                 }
             },
 
@@ -478,12 +392,7 @@
                     type: 'bar',
                     data: {
                         labels: Object.keys(dataMap),
-                        datasets: [{
-                            label: 'Gasto',
-                            data: Object.values(dataMap),
-                            backgroundColor: getComputedStyle(document.documentElement).getPropertyValue('--accent-color').trim(),
-                            borderRadius: 6
-                        }]
+                        datasets: [{ label: 'Gasto', data: Object.values(dataMap), backgroundColor: getComputedStyle(document.documentElement).getPropertyValue('--accent-color').trim(), borderRadius: 6 }]
                     },
                     options: { responsive: true, plugins: { legend: {display: false} }, scales: { y: {beginAtZero: true} } }
                 });
@@ -496,10 +405,7 @@
                 document.getElementById('inp-date').valueAsDate = new Date();
             },
             closeModal: (e) => { if(e.target.id === 'modal-sheet') app.forceCloseModal(); },
-            forceCloseModal: () => {
-                document.getElementById('modal-sheet').classList.remove('sheet-open');
-                setTimeout(() => document.getElementById('modal-sheet').style.display = 'none', 300);
-            },
+            forceCloseModal: () => { document.getElementById('modal-sheet').classList.remove('sheet-open'); setTimeout(() => document.getElementById('modal-sheet').style.display = 'none', 300); },
 
             populateCats: () => {
                 const sel = document.getElementById('inp-category');
@@ -514,9 +420,7 @@
             },
             checkSub: (sel) => {
                 const inp = document.getElementById('inp-concept');
-                if(['suscripciones','gastos_extra'].includes(sel.value)) {
-                    inp.placeholder = "Concepto obligatorio"; inp.required = true; inp.focus();
-                } else { inp.placeholder = "Opcional"; inp.required = false; }
+                if(['suscripciones','gastos_extra'].includes(sel.value)) { inp.placeholder = "Concepto obligatorio"; inp.required = true; inp.focus(); } else { inp.placeholder = "Opcional"; inp.required = false; }
             },
 
             categories: {
