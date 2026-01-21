@@ -1,0 +1,624 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="Finanzapps">
+    
+    <link rel="apple-touch-icon" href="icon.png">
+    <link rel="icon" type="image/png" href="icon.png">
+    
+    <title>Finanzapps</title>
+    
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <style>
+        /* --- iOS DESIGN SYSTEM --- */
+        :root {
+            /* Colores Apple System */
+            --ios-bg: #F2F2F7;
+            --ios-card: #FFFFFF;
+            --ios-text: #000000;
+            --ios-text-secondary: #8E8E93;
+            --ios-blue: #007AFF;
+            --ios-red: #FF3B30;
+            --ios-green: #34C759;
+            --ios-separator: #C6C6C8;
+            
+            /* Tus Colores de Marca */
+            --brand-personal: #007AFF;
+            --brand-sandra: #FF2D55;
+            --brand-common: #5856D6;
+            
+            /* Variables Dinámicas */
+            --accent-color: var(--brand-personal);
+            
+            --radius: 12px;
+        }
+
+        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; }
+        
+        body {
+            background-color: var(--ios-bg);
+            margin: 0; padding: 0;
+            color: var(--ios-text);
+            height: 100vh;
+            overflow: hidden;
+            /* Soporte Safe Area (Notch iPhone) */
+            padding-top: env(safe-area-inset-top);
+            padding-bottom: env(safe-area-inset-bottom);
+        }
+
+        /* VISTAS */
+        .view {
+            display: none; width: 100%; height: 100%; overflow-y: auto;
+            position: absolute; top: 0; left: 0;
+            background: var(--ios-bg);
+            animation: fadeIn 0.2s ease-in-out;
+        }
+        .view.active { display: block; }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+        /* --- PANTALLA LOGIN --- */
+        #view-login {
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+            z-index: 9999;
+        }
+        .app-icon {
+            width: 80px; height: 80px; background: white; border-radius: 18px;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 40px; color: #333; box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+        }
+        .ios-input {
+            background: white; border: 1px solid #d1d1d6; border-radius: 10px;
+            padding: 12px; width: 280px; font-size: 16px; margin-bottom: 15px; outline: none;
+        }
+        .ios-input:focus { border-color: var(--ios-blue); }
+        .ios-btn {
+            background: var(--ios-blue); color: white; border: none; padding: 12px;
+            width: 280px; border-radius: 10px; font-size: 17px; font-weight: 600; cursor: pointer;
+        }
+        .auth-link { margin-top: 20px; color: var(--ios-blue); font-size: 14px; cursor: pointer; }
+
+        /* --- DASHBOARD HEADER --- */
+        .ios-header {
+            padding: 20px 20px 10px 20px;
+            background: var(--ios-bg);
+            position: sticky; top: 0; z-index: 100;
+        }
+        .header-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
+        .back-btn { color: var(--ios-blue); font-size: 17px; background: none; border: none; padding: 0; display: flex; align-items: center; gap: 5px;}
+        .header-title { font-size: 34px; font-weight: 800; margin: 0; letter-spacing: -0.5px; color: black; }
+        .header-subtitle { font-size: 13px; color: var(--ios-text-secondary); text-transform: uppercase; font-weight: 600; margin-top: 10px;}
+        
+        .balance-amount { font-size: 32px; font-weight: 700; color: var(--ios-text); cursor: pointer;}
+
+        /* --- SEGMENTED CONTROL (Pestañas iOS) --- */
+        .ios-segment {
+            background: #E5E5EA; border-radius: 9px; padding: 2px;
+            display: flex; margin: 15px 20px;
+        }
+        .segment-btn {
+            flex: 1; border: none; background: transparent; padding: 6px;
+            border-radius: 7px; font-size: 13px; font-weight: 600; color: black;
+            transition: all 0.2s;
+        }
+        .segment-btn.active { background: white; box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
+
+        /* --- LISTAS (Estilo Inset Grouped) --- */
+        .ios-list {
+            margin: 0 20px 100px 20px; /* Margen bottom grande para el FAB */
+            background: white; border-radius: 12px;
+            overflow: hidden;
+        }
+        .list-item {
+            display: flex; align-items: center; justify-content: space-between;
+            padding: 12px 16px; border-bottom: 1px solid var(--ios-separator);
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+        .list-item:last-child { border-bottom: none; }
+        .list-item:active { background: #F2F2F7; }
+
+        .item-icon {
+            width: 36px; height: 36px; border-radius: 8px; background: var(--accent-color);
+            display: flex; align-items: center; justify-content: center; color: white;
+            font-size: 16px; margin-right: 12px;
+        }
+        .item-content { flex: 1; }
+        .item-title { font-size: 16px; font-weight: 600; margin-bottom: 2px; }
+        .item-sub { font-size: 13px; color: var(--ios-text-secondary); }
+        .item-amount { font-size: 16px; font-weight: 600; }
+        .t-red { color: var(--ios-text); }
+        .t-green { color: var(--ios-green); }
+
+        /* --- FAB (Botón +) --- */
+        .fab {
+            position: fixed; bottom: 40px; right: 20px;
+            width: 56px; height: 56px; border-radius: 50%;
+            background: var(--accent-color); color: white;
+            border: none; box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+            font-size: 24px; display: flex; align-items: center; justify-content: center;
+            z-index: 200; transition: transform 0.1s;
+        }
+        .fab:active { transform: scale(0.9); }
+
+        /* --- MODAL TIPO SHEET --- */
+        .sheet-overlay {
+            display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.4); z-index: 1000; backdrop-filter: blur(2px);
+        }
+        .sheet-content {
+            position: fixed; bottom: 0; left: 0; width: 100%;
+            background: #F2F2F7;
+            border-top-left-radius: 15px; border-top-right-radius: 15px;
+            padding: 20px; padding-bottom: 50px;
+            transform: translateY(100%); transition: transform 0.3s cubic-bezier(0.2, 0.8, 0.2, 1);
+        }
+        .sheet-handle {
+            width: 40px; height: 5px; background: #C5C5C7; border-radius: 3px;
+            margin: 0 auto 20px auto;
+        }
+        .sheet-open .sheet-content { transform: translateY(0); }
+
+        /* Formulario iOS Style */
+        .input-group-ios { background: white; border-radius: 10px; overflow: hidden; margin-bottom: 20px; }
+        .input-row { 
+            display: flex; align-items: center; padding: 0 15px; 
+            border-bottom: 1px solid #E5E5EA; height: 50px;
+        }
+        .input-row:last-child { border-bottom: none; }
+        .input-row label { width: 100px; font-size: 16px; font-weight: 500; }
+        .input-row input, .input-row select {
+            flex: 1; border: none; font-size: 16px; background: transparent; outline: none; height: 100%;
+            color: var(--ios-blue); text-align: right;
+        }
+        
+        /* Selector de Cuentas (Estilo Table View) */
+        .account-selector-list { margin: 20px; border-radius: 12px; overflow: hidden; }
+        .account-row {
+            background: white; padding: 20px; display: flex; align-items: center;
+            border-bottom: 1px solid var(--ios-separator); cursor: pointer;
+        }
+        .account-row:active { background: #E5E5EA; }
+        .account-row:last-child { border-bottom: none; }
+        
+        .empty-state { text-align: center; color: #8E8E93; margin-top: 40px; }
+        .loader { width: 20px; height: 20px; border: 2px solid #ccc; border-top-color: #333; border-radius: 50%; animation: spin 1s linear infinite; margin: 0 auto; }
+        @keyframes spin { 100% { transform: rotate(360deg); } }
+
+        /* GRÁFICA */
+        #charts-container { padding: 20px; background: white; border-radius: 12px; margin: 0 20px; display: none;}
+    </style>
+</head>
+<body>
+
+    <div id="view-login" class="view active" style="display: flex;">
+        <div class="app-icon"><i class="fas fa-wallet"></i></div>
+        <h2 style="margin-bottom: 5px;">Finanzapps</h2>
+        <p style="color: #666; margin-bottom: 30px;">Edición iOS</p>
+        
+        <form id="auth-form" style="display:flex; flex-direction:column; align-items:center;">
+            <input type="email" id="email" class="ios-input" placeholder="Email" required>
+            <input type="password" id="password" class="ios-input" placeholder="Contraseña" required>
+            <button type="submit" class="ios-btn" id="btn-auth-action">
+                <span id="btn-text">Entrar</span>
+                <div class="loader" id="auth-loader" style="display:none; border-color:rgba(255,255,255,0.5); border-top-color:white;"></div>
+            </button>
+            <div class="auth-link" onclick="app.toggleAuthMode()">
+                <span id="toggle-text">Crear cuenta nueva</span>
+            </div>
+        </form>
+    </div>
+
+    <div id="view-selector" class="view">
+        <div class="ios-header">
+            <h1 class="header-title">Cuentas</h1>
+            <p style="color: var(--ios-text-secondary); margin-top: 5px;">Hola, <span id="user-name-display">Usuario</span></p>
+        </div>
+
+        <div class="account-selector-list">
+            <div class="account-row" onclick="app.selectAccount('personal')">
+                <div class="item-icon" id="icon-personal" style="background: var(--brand-personal); margin-right: 15px;">
+                    <i class="fas fa-user"></i>
+                </div>
+                <div style="flex:1;">
+                    <div style="font-weight: 600; font-size: 17px;">Personal</div>
+                    <div style="font-size: 14px; color: #8E8E93;">Mis gastos privados</div>
+                </div>
+                <i class="fas fa-chevron-right" style="color: #C7C7CC;"></i>
+            </div>
+
+            <div class="account-row" onclick="app.selectAccount('comun')">
+                <div class="item-icon" style="background: var(--brand-common); margin-right: 15px;">
+                    <i class="fas fa-users"></i>
+                </div>
+                <div style="flex:1;">
+                    <div style="font-weight: 600; font-size: 17px;">Común</div>
+                    <div style="font-size: 14px; color: #8E8E93;">Compartido</div>
+                </div>
+                <i class="fas fa-chevron-right" style="color: #C7C7CC;"></i>
+            </div>
+        </div>
+
+        <div style="text-align: center; margin-top: 40px;">
+            <button onclick="app.logout()" style="color: var(--ios-red); border:none; background:none; font-size: 16px;">Cerrar Sesión</button>
+        </div>
+    </div>
+
+    <div id="view-dashboard" class="view">
+        <div class="ios-header">
+            <div class="header-top">
+                <button class="back-btn" onclick="app.goBack()">
+                    <i class="fas fa-chevron-left"></i> <span id="lbl-account-name">Atrás</span>
+                </button>
+                <i class="fas fa-bell" style="color: var(--ios-blue); font-size: 20px;" onclick="alert('Notificaciones: Sin novedades')"></i>
+            </div>
+            
+            <div class="header-subtitle">BALANCE TOTAL</div>
+            <div class="balance-amount" id="total-balance" onclick="app.editInitialBalance()">...</div>
+        </div>
+
+        <div class="ios-segment">
+            <button id="seg-list" class="segment-btn active" onclick="app.toggleView('list')">Movimientos</button>
+            <button id="seg-chart" class="segment-btn" onclick="app.toggleView('chart')">Análisis</button>
+        </div>
+
+        <div id="container-list" class="ios-list">
+            <div class="empty-state">Cargando...</div>
+        </div>
+
+        <div id="container-chart" style="display: none;">
+            <div id="charts-container">
+                <canvas id="expensesChart"></canvas>
+            </div>
+        </div>
+
+        <button class="fab" onclick="app.openModal()">
+            <i class="fas fa-plus"></i>
+        </button>
+    </div>
+
+    <div id="modal-sheet" class="sheet-overlay" onclick="app.closeModal(event)">
+        <div class="sheet-content">
+            <div class="sheet-handle"></div>
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 20px;">
+                <h3 style="margin:0;">Nuevo Movimiento</h3>
+                <button onclick="app.forceCloseModal()" style="border:none; background:none; color:var(--ios-blue); font-weight:600; font-size:17px;">Cancelar</button>
+            </div>
+
+            <form id="transaction-form">
+                <div class="input-group-ios">
+                    <div class="input-row">
+                        <label>Cantidad</label>
+                        <input type="number" id="inp-amount" placeholder="0.00 €" step="0.01" inputmode="decimal" required style="font-size: 20px; font-weight: 600;">
+                    </div>
+                    <div class="input-row">
+                        <label>Categoría</label>
+                        <select id="inp-category" required onchange="app.checkSub(this)">
+                            <option value="" disabled selected>Seleccionar</option>
+                        </select>
+                    </div>
+                    <div class="input-row">
+                        <label>Fecha</label>
+                        <input type="date" id="inp-date" required>
+                    </div>
+                    <div class="input-row">
+                        <label>Nota</label>
+                        <input type="text" id="inp-concept" placeholder="Opcional">
+                    </div>
+                </div>
+                <button type="submit" class="ios-btn" style="width:100%; background: var(--accent-color);">Guardar</button>
+            </form>
+        </div>
+    </div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+        import { getFirestore, collection, addDoc, query, where, onSnapshot, doc, deleteDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+        import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+
+        // --- TU CONFIGURACIÓN FIREBASE ---
+        const firebaseConfig = {
+            apiKey: "AIzaSyDriSSF-UpUlJS2rHcjZ7N0dAsPFpPYgm4",
+            authDomain: "finanzapps-e2edc.firebaseapp.com",
+            projectId: "finanzapps-e2edc",
+            storageBucket: "finanzapps-e2edc.firebasestorage.app",
+            messagingSenderId: "845819455154",
+            appId: "1:845819455154:web:72fcc69e42209dcd970bab"
+        };
+
+        const fApp = initializeApp(firebaseConfig);
+        const db = getFirestore(fApp);
+        const auth = getAuth(fApp);
+        let myChart = null;
+
+        // --- APP LOGIC ---
+        window.app = {
+            state: {
+                user: null,
+                currentAccount: 'personal',
+                isRegistering: false,
+                unsubscribe: null,
+                initialBalance: 0,
+                transactions: []
+            },
+
+            init: () => {
+                onAuthStateChanged(auth, (user) => {
+                    if(user) {
+                        window.app.state.user = user;
+                        document.getElementById('user-name-display').innerText = user.email.split('@')[0];
+                        window.app.changeView('view-selector');
+                    } else {
+                        window.app.changeView('view-login');
+                    }
+                });
+                document.getElementById('auth-form').addEventListener('submit', window.app.handleAuth);
+                document.getElementById('transaction-form').addEventListener('submit', window.app.saveData);
+            },
+
+            toggleAuthMode: () => {
+                const s = window.app.state;
+                s.isRegistering = !s.isRegistering;
+                document.getElementById('btn-text').innerText = s.isRegistering ? "Crear Cuenta" : "Entrar";
+                document.getElementById('toggle-text').innerText = s.isRegistering ? "¿Ya tienes cuenta? Entrar" : "Crear cuenta nueva";
+            },
+
+            handleAuth: async (e) => {
+                e.preventDefault();
+                const email = document.getElementById('email').value;
+                const pass = document.getElementById('password').value;
+                const loader = document.getElementById('auth-loader');
+                const btnTxt = document.getElementById('btn-text');
+                
+                loader.style.display = 'block'; btnTxt.style.display = 'none';
+                try {
+                    if(window.app.state.isRegistering) await createUserWithEmailAndPassword(auth, email, pass);
+                    else await signInWithEmailAndPassword(auth, email, pass);
+                } catch(err) { alert(err.message); }
+                finally { loader.style.display = 'none'; btnTxt.style.display = 'block'; }
+            },
+
+            logout: () => { signOut(auth); if(window.app.state.unsubscribe) window.app.state.unsubscribe(); },
+
+            changeView: (id) => {
+                document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+                document.getElementById(id).classList.add('active');
+            },
+            goBack: () => {
+                if(window.app.state.unsubscribe) window.app.state.unsubscribe();
+                window.app.changeView('view-selector');
+            },
+
+            selectAccount: (type) => {
+                window.app.state.currentAccount = type;
+                const root = document.documentElement;
+                const isSandra = window.app.state.user.email.toLowerCase().includes('sandra');
+                
+                if(type === 'personal') {
+                    const color = isSandra ? 'var(--brand-sandra)' : 'var(--brand-personal)';
+                    root.style.setProperty('--accent-color', color);
+                    document.getElementById('lbl-account-name').innerText = "Cuentas";
+                } else {
+                    root.style.setProperty('--accent-color', 'var(--brand-common)');
+                    document.getElementById('lbl-account-name').innerText = "Cuentas";
+                }
+
+                const storageKey = `bal_${window.app.state.user.uid}_${type}`;
+                window.app.state.initialBalance = parseFloat(localStorage.getItem(storageKey)) || 0;
+
+                window.app.toggleView('list');
+                window.app.changeView('view-dashboard');
+                window.app.listenToData();
+            },
+
+            toggleView: (mode) => {
+                const list = document.getElementById('container-list');
+                const chart = document.getElementById('container-chart');
+                const btnList = document.getElementById('seg-list');
+                const btnChart = document.getElementById('seg-chart');
+
+                if(mode === 'list') {
+                    list.style.display = 'block'; chart.style.display = 'none';
+                    btnList.classList.add('active'); btnChart.classList.remove('active');
+                } else {
+                    list.style.display = 'none'; chart.style.display = 'block';
+                    btnList.classList.remove('active'); btnChart.classList.add('active');
+                    window.app.renderChart();
+                }
+            },
+
+            listenToData: () => {
+                const listEl = document.getElementById('container-list');
+                const totalEl = document.getElementById('total-balance');
+                listEl.innerHTML = '<div class="empty-state"><div class="loader" style="border-color:#ccc; border-top-color:#333;"></div></div>';
+
+                let q;
+                const colRef = collection(db, "transactions");
+                if(window.app.state.currentAccount === 'personal') {
+                    q = query(colRef, where("type", "==", "personal"), where("uid", "==", window.app.state.user.uid));
+                } else {
+                    q = query(colRef, where("type", "==", "comun"));
+                }
+
+                window.app.state.unsubscribe = onSnapshot(q, (snapshot) => {
+                    listEl.innerHTML = '';
+                    let balance = window.app.state.initialBalance;
+                    const txs = [];
+
+                    if(snapshot.empty) {
+                        listEl.innerHTML = '<div class="empty-state">Sin movimientos</div>';
+                        totalEl.innerText = new Intl.NumberFormat('es-ES', {style:'currency', currency:'EUR'}).format(balance);
+                        return;
+                    }
+
+                    snapshot.forEach(doc => {
+                        const d = doc.data(); d.id = doc.id; txs.push(d);
+                    });
+                    
+                    txs.sort((a,b) => new Date(b.date) - new Date(a.date));
+                    window.app.state.transactions = txs;
+
+                    txs.forEach(t => {
+                        const isExpense = ['gasto_revolut','bitcoin','mapfre','cti','gasolina','crossfit','suscripciones','varios','hipoteca','credito_coche','luz','agua','gas','telefonia','comedor','comida','gastos_extra'].includes(t.category);
+                        if(isExpense) balance -= t.amount; else balance += t.amount;
+
+                        const icon = window.app.icons[t.category] || 'fa-tag';
+                        const colorClass = isExpense ? 't-red' : 't-green';
+                        const sign = isExpense ? '-' : '+';
+                        
+                        let catName = t.category;
+                        const accCats = window.app.categories[window.app.state.currentAccount];
+                        if(accCats.ingresos[t.category]) catName = accCats.ingresos[t.category];
+                        else if(accCats.gastos[t.category]) catName = accCats.gastos[t.category];
+
+                        const html = `
+                        <div class="list-item" onclick="app.askDelete('${t.id}')">
+                            <div style="display:flex; align-items:center;">
+                                <div class="item-icon"><i class="fas ${icon}"></i></div>
+                                <div>
+                                    <div class="item-title">${catName}</div>
+                                    <div class="item-sub">${t.concept || t.date}</div>
+                                </div>
+                            </div>
+                            <div class="item-amount ${colorClass}">${sign} ${t.amount} €</div>
+                        </div>`;
+                        listEl.insertAdjacentHTML('beforeend', html);
+                    });
+                    
+                    totalEl.innerText = new Intl.NumberFormat('es-ES', {style:'currency', currency:'EUR'}).format(balance);
+                    if(document.getElementById('container-chart').style.display === 'block') window.app.renderChart();
+                });
+            },
+
+            saveData: async (e) => {
+                e.preventDefault();
+                const amt = parseFloat(document.getElementById('inp-amount').value);
+                const cat = document.getElementById('inp-category').value;
+                const concept = document.getElementById('inp-concept').value;
+                const date = document.getElementById('inp-date').value;
+
+                try {
+                    await addDoc(collection(db, "transactions"), {
+                        uid: window.app.state.user.uid,
+                        userEmail: window.app.state.user.email,
+                        type: window.app.state.currentAccount,
+                        amount: amt, category: cat, concept: concept, date: date,
+                        timestamp: Date.now()
+                    });
+                    window.app.forceCloseModal();
+                    e.target.reset();
+                } catch(err) { alert(err.message); }
+            },
+
+            askDelete: async (id) => {
+                if(confirm("¿Eliminar movimiento?")) {
+                    await deleteDoc(doc(db, "transactions", id));
+                }
+            },
+
+            editInitialBalance: () => {
+                const current = window.app.state.initialBalance;
+                const val = prompt("Saldo Inicial (Base):", current);
+                if(val && !isNaN(val)) {
+                    const key = `bal_${window.app.state.user.uid}_${window.app.state.currentAccount}`;
+                    localStorage.setItem(key, val);
+                    window.app.state.initialBalance = parseFloat(val);
+                    window.app.listenToData();
+                }
+            },
+
+            renderChart: () => {
+                const ctx = document.getElementById('expensesChart').getContext('2d');
+                const dataMap = {};
+                window.app.state.transactions.forEach(t => {
+                    const isExpense = ['gasto_revolut','bitcoin','mapfre','cti','gasolina','crossfit','suscripciones','varios','hipoteca','credito_coche','luz','agua','gas','telefonia','comedor','comida','gastos_extra'].includes(t.category);
+                    if(isExpense) {
+                        let name = t.category;
+                        const accCats = window.app.categories[window.app.state.currentAccount];
+                        if(accCats.gastos[t.category]) name = accCats.gastos[t.category].replace(/[^a-zA-ZñÑ\s]/g,'').trim();
+                        if(!dataMap[name]) dataMap[name] = 0;
+                        dataMap[name] += t.amount;
+                    }
+                });
+
+                if(myChart) myChart.destroy();
+                myChart = new Chart(ctx, {
+                    type: 'bar',
+                    data: {
+                        labels: Object.keys(dataMap),
+                        datasets: [{
+                            label: 'Gasto',
+                            data: Object.values(dataMap),
+                            backgroundColor: getComputedStyle(document.documentElement).getPropertyValue('--accent-color').trim(),
+                            borderRadius: 6
+                        }]
+                    },
+                    options: { responsive: true, plugins: { legend: {display: false} }, scales: { y: {beginAtZero: true} } }
+                });
+            },
+
+            openModal: () => {
+                window.app.populateCats();
+                document.getElementById('modal-sheet').classList.add('sheet-open');
+                document.getElementById('modal-sheet').style.display = 'block';
+                document.getElementById('inp-date').valueAsDate = new Date();
+            },
+            closeModal: (e) => {
+                if(e.target.id === 'modal-sheet') window.app.forceCloseModal();
+            },
+            forceCloseModal: () => {
+                document.getElementById('modal-sheet').classList.remove('sheet-open');
+                setTimeout(() => document.getElementById('modal-sheet').style.display = 'none', 300);
+            },
+
+            populateCats: () => {
+                const sel = document.getElementById('inp-category');
+                sel.innerHTML = '<option value="" disabled selected>Seleccionar</option>';
+                const cats = window.app.categories[window.app.state.currentAccount];
+                
+                let g1 = document.createElement('optgroup'); g1.label = "Ingresos";
+                for(const [k,v] of Object.entries(cats.ingresos)) {
+                    let o = document.createElement('option'); o.value=k; o.innerText=v; g1.appendChild(o);
+                }
+                sel.appendChild(g1);
+
+                let g2 = document.createElement('optgroup'); g2.label = "Gastos";
+                for(const [k,v] of Object.entries(cats.gastos)) {
+                    let o = document.createElement('option'); o.value=k; o.innerText=v; g2.appendChild(o);
+                }
+                sel.appendChild(g2);
+            },
+            checkSub: (sel) => {
+                const inp = document.getElementById('inp-concept');
+                if(['suscripciones','gastos_extra'].includes(sel.value)) {
+                    inp.placeholder = "Concepto obligatorio"; inp.required = true; inp.focus();
+                } else { inp.placeholder = "Opcional"; inp.required = false; }
+            },
+
+            categories: {
+                personal: {
+                    ingresos: { nomina: '💰 Nómina', ingreso_extra: '💵 Ingreso Extra' },
+                    gastos: { aporte_comun: '🏠 Aporte Común', ahorro_revolut: '🐷 Ahorro', gasto_revolut: '💳 Gasto', bitcoin: '₿ Crypto', mapfre: '🛡️ Seguro', cti: '💳 Tarjeta CTI', gasolina: '⛽ Gasolina', crossfit: '🏋️ Crossfit', suscripciones: '📺 Suscripciones', varios: '🛒 Varios' }
+                },
+                comun: {
+                    ingresos: { aporte_jose: '👨🏻 Aporte Jose', aporte_sandra: '👩🏼 Aporte Sandra', aporte_extra: '💵 Extra' },
+                    gastos: { hipoteca: '🏠 Hipoteca', credito_coche: '🚗 Coche', luz: '⚡ Luz', agua: '💧 Agua', gas: '🔥 Gas', telefonia: '📱 Internet', comedor: '🍽️ Comedor', comida: '🛒 Supermercado', suscripciones: '📺 Suscripciones', gastos_extra: '💸 Otros' }
+                }
+            },
+            icons: {
+                nomina: 'fa-money-bill-wave', ingreso_extra: 'fa-hand-holding-usd', aporte_comun: 'fa-exchange-alt', ahorro_revolut: 'fa-piggy-bank', gasto_revolut: 'fa-credit-card', bitcoin: 'fa-bitcoin', mapfre: 'fa-shield-alt', cti: 'fa-id-card', gasolina: 'fa-gas-pump', crossfit: 'fa-dumbbell', varios: 'fa-shopping-cart', aporte_jose: 'fa-user-plus', aporte_sandra: 'fa-user-plus', aporte_extra: 'fa-plus-circle', hipoteca: 'fa-home', credito_coche: 'fa-car', luz: 'fa-bolt', agua: 'fa-tint', gas: 'fa-fire', telefonia: 'fa-wifi', comedor: 'fa-utensils', comida: 'fa-shopping-basket', suscripciones: 'fa-tv', gastos_extra: 'fa-receipt'
+            }
+        };
+
+        window.app.init();
+    </script>
+</body>
+</html>
