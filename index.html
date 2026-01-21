@@ -8,8 +8,8 @@
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="Finanzapps">
     
-    <link rel="apple-touch-icon" href="icon.png">
-    <link rel="icon" type="image/png" href="icon.png">
+    <link rel="apple-touch-icon" href="Diseño sin título (1).png">
+    <link rel="icon" type="image/png" href="Diseño sin título (1).png">
     
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
@@ -37,23 +37,20 @@
         body {
             background-color: var(--bg); margin: 0; padding: 0;
             height: 100vh; overflow: hidden;
-            /* Eliminamos padding del body para gestionarlo en los headers */
             color: var(--text);
         }
 
         .view {
             display: none; width: 100%; height: 100%; overflow-y: auto;
             position: absolute; top: 0; left: 0; background: var(--bg);
-            /* Scroll suave estilo iOS */
             -webkit-overflow-scrolling: touch; 
-            padding-bottom: 100px; /* Espacio extra al final */
+            padding-bottom: 100px;
         }
         .view.active { display: block; }
 
         /* --- HEADER ADAPTADO AL NOTCH --- */
         .ios-header-lg { 
             background: var(--bg);
-            /* AQUÍ ESTÁ LA MAGIA: Padding base + Espacio seguro del iPhone */
             padding-top: calc(env(safe-area-inset-top) + 20px); 
             padding-left: 20px; padding-right: 20px; padding-bottom: 10px;
         }
@@ -65,11 +62,9 @@
             display: flex; justify-content: space-between; align-items: center;
             background: var(--bg); 
             position: sticky; top: 0; z-index: 50;
-            /* AJUSTE NOTCH: Baja el contenido para que no lo tape la cámara */
             padding-top: calc(env(safe-area-inset-top) + 10px);
             padding-bottom: 10px;
             padding-left: 20px; padding-right: 20px;
-            /* Efecto cristal al hacer scroll */
             backdrop-filter: blur(10px);
             -webkit-backdrop-filter: blur(10px);
             background-color: rgba(242, 242, 247, 0.85); 
@@ -80,7 +75,6 @@
             display: flex; align-items: center; gap: 5px; cursor: pointer; padding: 10px 0;
         }
 
-        /* RESTO DEL DISEÑO */
         .ios-group { margin: 20px; background: var(--card); border-radius: var(--radius); overflow: hidden; box-shadow: 0 1px 2px rgba(0,0,0,0.05); }
         .ios-row { padding: 16px; display: flex; align-items: center; border-bottom: 0.5px solid var(--separator); cursor: pointer; transition: background 0.2s; }
         .ios-row:last-child { border-bottom: none; }
@@ -106,7 +100,6 @@
         .tx-amount { font-size: 17px; font-weight: 600; }
         .green { color: var(--green); } .red { color: black; }
 
-        /* FAB AJUSTADO (Subido para evitar la barra inferior) */
         .fab {
             position: fixed; 
             bottom: calc(env(safe-area-inset-bottom) + 30px); 
@@ -119,7 +112,6 @@
         }
         .fab:active { transform: scale(0.92); }
 
-        /* MODAL */
         .modal-mask { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.4); z-index: 1000; backdrop-filter: blur(3px); }
         .modal-sheet { position: fixed; bottom: 0; width: 100%; background: #F2F2F7; border-top-left-radius: 20px; border-top-right-radius: 20px; padding: 20px; padding-bottom: 60px; transform: translateY(100%); transition: transform 0.3s cubic-bezier(0.2, 0.8, 0.2, 1); }
         .modal-open .modal-sheet { transform: translateY(0); }
@@ -267,11 +259,9 @@
                 if(type === 'personal') root.style.setProperty('--accent', '#007AFF');
                 else root.style.setProperty('--accent', '#5856D6');
 
-                // Cargar saldo local
                 const savedBal = localStorage.getItem(`bal_${type}`);
                 app.state.balance = savedBal ? parseFloat(savedBal) : 0;
 
-                // Transición
                 document.getElementById('view-selector').classList.remove('active');
                 document.getElementById('view-dashboard').classList.add('active');
                 
