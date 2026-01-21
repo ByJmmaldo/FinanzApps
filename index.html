@@ -17,194 +17,246 @@
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
 
     <style>
-        /* --- ESTÉTICA iOS (SEGUN TU CAPTURA) --- */
+        /* --- DISEÑO iOS PURO --- */
         :root {
-            --ios-bg: #F2F2F7;
-            --ios-blue: #007AFF; /* Azul brillante de tu captura */
-            --ios-text: #000000;
-            --ios-gray: #8E8E93;
-            --radius: 14px;
+            --bg: #F2F2F7;
+            --card: #FFFFFF;
+            --text: #000000;
+            --subtext: #8E8E93;
+            --blue: #007AFF;
+            --red: #FF3B30;
+            --green: #34C759;
+            --separator: #C6C6C8;
+            --radius: 12px;
+            
+            /* TEMA DINÁMICO */
+            --accent: #007AFF; 
         }
 
-        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; }
+        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
         
         body {
-            background-color: var(--ios-bg); margin: 0; padding: 0;
+            background-color: var(--bg); margin: 0; padding: 0;
             height: 100vh; overflow: hidden;
             padding-top: env(safe-area-inset-top); padding-bottom: env(safe-area-inset-bottom);
+            color: var(--text);
         }
 
+        /* SISTEMA DE VISTAS */
         .view {
             display: none; width: 100%; height: 100%; overflow-y: auto;
-            position: absolute; top: 0; left: 0; background: var(--ios-bg);
-            animation: fadeIn 0.3s ease-out;
+            position: absolute; top: 0; left: 0; background: var(--bg);
+            animation: fadeIn 0.2s ease-out;
         }
         .view.active { display: block; }
         @keyframes fadeIn { from { opacity: 0; transform: scale(0.99); } to { opacity: 1; transform: scale(1); } }
 
-        /* --- 1. PANTALLA BIENVENIDA (TU CAPTURA) --- */
-        #view-welcome {
-            background: linear-gradient(135deg, #e6f0ff 0%, #f0f4f8 100%);
-            display: flex; flex-direction: column; align-items: center; justify-content: center;
-            z-index: 9999;
+        /* --- VISTA 1: SELECTOR (PANTALLA DE INICIO AHORA) --- */
+        #view-selector { padding-top: 20px; }
+        
+        .ios-header-lg { padding: 20px 20px 10px 20px; background: var(--bg); }
+        .title-lg { font-size: 34px; font-weight: 800; letter-spacing: -0.5px; margin: 0; }
+        .subtitle { font-size: 17px; color: var(--subtext); margin-top: 5px; font-weight: 400; }
+
+        .ios-group {
+            margin: 20px; background: var(--card); border-radius: var(--radius); overflow: hidden;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+        }
+        .ios-row {
+            padding: 16px; display: flex; align-items: center;
+            border-bottom: 0.5px solid var(--separator); cursor: pointer;
+            transition: background 0.2s;
+        }
+        .ios-row:last-child { border-bottom: none; }
+        .ios-row:active { background: #E5E5EA; }
+
+        .row-icon {
+            width: 32px; height: 32px; border-radius: 7px; display: flex; align-items: center; justify-content: center;
+            color: white; font-size: 14px; margin-right: 15px;
+        }
+        .row-text { flex: 1; }
+        .row-title { font-size: 17px; font-weight: 600; margin-bottom: 2px; }
+        .row-sub { font-size: 14px; color: var(--subtext); }
+
+        /* --- VISTA 2: DASHBOARD --- */
+        .nav-bar {
+            display: flex; justify-content: space-between; align-items: center;
+            padding: 15px 20px; background: var(--bg); position: sticky; top: 0; z-index: 50;
+        }
+        .btn-back {
+            color: var(--blue); font-size: 17px; font-weight: 500; border: none; background: none;
+            display: flex; align-items: center; gap: 5px; cursor: pointer;
         }
         
-        .avatar-circle {
-            width: 100px; height: 100px; background: white; border-radius: 50%;
+        .balance-container { padding: 10px 20px 25px 20px; }
+        .lbl-balance { font-size: 13px; color: var(--subtext); font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; }
+        .hero-balance { font-size: 36px; font-weight: 700; margin-top: 5px; letter-spacing: -0.5px; cursor: pointer; }
+
+        /* Pestañas iOS */
+        .segment {
+            background: #E5E5EA; border-radius: 9px; padding: 2px;
+            display: flex; margin: 0 20px 20px 20px;
+        }
+        .seg-btn {
+            flex: 1; padding: 6px; border: none; background: none;
+            font-size: 13px; font-weight: 600; border-radius: 7px; cursor: pointer;
+        }
+        .seg-btn.active { background: white; box-shadow: 0 1px 3px rgba(0,0,0,0.12); }
+
+        /* Lista de Movimientos */
+        .tx-list { margin: 0 20px 120px 20px; background: white; border-radius: var(--radius); overflow: hidden; }
+        .tx-row {
+            display: flex; justify-content: space-between; align-items: center;
+            padding: 14px 16px; border-bottom: 0.5px solid var(--separator); cursor: pointer;
+        }
+        .tx-row:active { background: #E5E5EA; }
+        .tx-row:last-child { border-bottom: none; }
+        
+        .tx-icon {
+            width: 38px; height: 38px; border-radius: 10px; background: #F2F2F7;
             display: flex; align-items: center; justify-content: center;
-            font-size: 45px; color: var(--ios-blue); 
-            box-shadow: 0 10px 30px rgba(0,122,255,0.15);
-            margin-bottom: 25px;
+            color: #333; margin-right: 12px; font-size: 16px;
         }
-        
-        .welcome-title { font-size: 28px; font-weight: 700; color: #111; margin-bottom: 8px; }
-        .welcome-sub { font-size: 17px; color: #666; margin-bottom: 40px; font-weight: 400; }
-        
-        .btn-enter {
-            background: var(--ios-blue); color: white; border: none;
-            padding: 16px 0; width: 220px; border-radius: 14px;
-            font-size: 17px; font-weight: 600; cursor: pointer;
-            box-shadow: 0 5px 15px rgba(0,122,255,0.3);
-            transition: transform 0.1s;
+        .tx-amount { font-size: 17px; font-weight: 600; }
+        .green { color: var(--green); } .red { color: black; }
+
+        /* FAB */
+        .fab {
+            position: fixed; bottom: 40px; right: 20px;
+            width: 56px; height: 56px; border-radius: 50%;
+            background: var(--accent); color: white;
+            border: none; box-shadow: 0 4px 15px rgba(0,0,0,0.25);
+            font-size: 24px; display: flex; align-items: center; justify-content: center;
+            z-index: 100; transition: transform 0.1s; cursor: pointer;
         }
-        .btn-enter:active { transform: scale(0.96); }
+        .fab:active { transform: scale(0.92); }
 
-        /* --- 2. SELECTOR --- */
-        .ios-header { padding: 20px 20px 10px 20px; background: var(--ios-bg); }
-        .header-title { font-size: 34px; font-weight: 800; margin: 0; letter-spacing: -0.5px; }
-        
-        .account-group { margin: 20px; background: white; border-radius: 12px; overflow: hidden; }
-        .account-row {
-            padding: 18px; display: flex; align-items: center;
-            border-bottom: 1px solid #E5E5EA; cursor: pointer;
+        /* MODAL (Hoja Inferior) */
+        .modal-mask {
+            display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.4); z-index: 1000; backdrop-filter: blur(3px);
         }
-        .account-row:last-child { border-bottom: none; }
-        .account-row:active { background: #E5E5EA; }
+        .modal-sheet {
+            position: fixed; bottom: 0; width: 100%; background: #F2F2F7;
+            border-top-left-radius: 20px; border-top-right-radius: 20px;
+            padding: 20px; padding-bottom: 60px;
+            transform: translateY(100%); transition: transform 0.3s cubic-bezier(0.2, 0.8, 0.2, 1);
+        }
+        .modal-open .modal-sheet { transform: translateY(0); }
         
-        .ac-icon {
-            width: 32px; height: 32px; border-radius: 8px; display: flex; align-items: center; justify-content: center;
-            color: white; margin-right: 15px; font-size: 14px;
+        .sheet-grabber { width: 36px; height: 5px; background: #C5C5C7; border-radius: 3px; margin: 0 auto 20px auto; }
+        
+        .form-group { background: white; border-radius: 12px; overflow: hidden; margin-bottom: 25px; }
+        .form-row {
+            display: flex; align-items: center; padding: 0 16px; height: 50px;
+            border-bottom: 0.5px solid var(--separator);
+        }
+        .form-row:last-child { border-bottom: none; }
+        .form-label { width: 90px; font-size: 16px; font-weight: 500; }
+        .form-input { flex: 1; border: none; text-align: right; font-size: 17px; outline: none; background: transparent; color: var(--blue); }
+        
+        .btn-save {
+            width: 100%; padding: 14px; border-radius: 12px; border: none;
+            background: var(--accent); color: white; font-size: 17px; font-weight: 600; cursor: pointer;
         }
 
-        /* --- 3. DASHBOARD --- */
-        .header-top { display: flex; justify-content: space-between; align-items: center; padding: 20px 20px 0 20px; }
-        .back-btn { color: var(--ios-blue); font-size: 17px; background: none; border: none; display: flex; align-items: center; gap: 5px; font-weight:500; cursor: pointer; }
-        
-        .balance-card { padding: 0 20px 20px 20px; }
-        .balance-label { font-size: 13px; color: #8E8E93; text-transform: uppercase; font-weight: 600; margin-top: 15px; }
-        .balance-amount { font-size: 38px; font-weight: 700; color: #000; cursor: pointer; }
-
-        .ios-segment { background: #E5E5EA; border-radius: 9px; padding: 2px; display: flex; margin: 0 20px 20px 20px; }
-        .segment-btn { flex: 1; border: none; background: transparent; padding: 6px; border-radius: 7px; font-size: 13px; font-weight: 600; cursor:pointer;}
-        .segment-btn.active { background: white; box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
-
-        .list-container { margin: 0 20px 100px 20px; background: white; border-radius: 12px; overflow: hidden; min-height: 200px; }
-        .list-item { display: flex; justify-content: space-between; align-items: center; padding: 14px 16px; border-bottom: 1px solid #E5E5EA; cursor:pointer;}
-        
-        .fab { position: fixed; bottom: 40px; right: 20px; width: 56px; height: 56px; border-radius: 50%; background: var(--ios-blue); color: white; border: none; box-shadow: 0 4px 15px rgba(0,122,255,0.4); font-size: 24px; display:flex; align-items:center; justify-content:center; z-index: 200; cursor:pointer;}
-
-        /* MODAL */
-        .sheet-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.4); z-index: 1000; backdrop-filter: blur(2px); }
-        .sheet-content { position: fixed; bottom: 0; width: 100%; background: #F2F2F7; border-top-left-radius: 20px; border-top-right-radius: 20px; padding: 20px; padding-bottom: 50px; transform: translateY(100%); transition: transform 0.3s; }
-        .sheet-open .sheet-content { transform: translateY(0); }
-        
-        .input-group { background: white; border-radius: 12px; overflow: hidden; margin-bottom: 25px; }
-        .input-row { display: flex; align-items: center; padding: 0 16px; border-bottom: 1px solid #E5E5EA; height: 55px; }
-        .input-row label { width: 100px; font-size: 16px; font-weight: 500; }
-        .input-row input, .input-row select { flex: 1; border: none; font-size: 17px; background: transparent; outline: none; text-align: right; color: var(--ios-blue); }
-        
-        #charts-container { display:none; padding: 20px; background: white; margin: 0 20px; border-radius: 12px; }
-        .t-red { color: #000; } .t-green { color: #34C759; }
+        #charts-wrapper { display: none; padding: 20px; background: white; margin: 0 20px; border-radius: 12px; }
+        .loader { border: 2px solid #ccc; border-top: 2px solid #666; border-radius: 50%; width: 20px; height: 20px; animation: spin 1s linear infinite; margin: 20px auto; }
+        @keyframes spin { 100% { transform: rotate(360deg); } }
     </style>
 </head>
 <body>
 
-    <div id="view-welcome" class="view active" style="display: flex;">
-        <div class="avatar-circle">
-            <i class="fas fa-user"></i>
+    <div id="view-selector" class="view active">
+        <div class="ios-header-lg">
+            <h1 class="title-lg">Cuentas</h1>
+            <div class="subtitle">Hola, Jose M.</div>
         </div>
-        <div class="welcome-title">Hola, Jose M.</div>
-        <div class="welcome-sub">¿Qué quieres hacer hoy?</div>
-        
-        <button class="btn-enter" onclick="window.app.enter()">
-            Entrar
-        </button>
-    </div>
 
-    <div id="view-selector" class="view">
-        <div class="ios-header">
-            <h1 class="header-title">Cuentas</h1>
-        </div>
-        
-        <div class="account-group">
-            <div class="account-row" onclick="window.app.selectAccount('personal')">
-                <div class="ac-icon" style="background: var(--ios-blue);"><i class="fas fa-wallet"></i></div>
-                <div style="flex:1;">
-                    <div style="font-weight: 600; font-size: 17px;">Personal</div>
-                    <div style="font-size: 14px; color: #8E8E93;">Mis gastos privados</div>
+        <div class="ios-group">
+            <div class="ios-row" onclick="app.selectAccount('personal')">
+                <div class="row-icon" style="background: var(--blue);"><i class="fas fa-user"></i></div>
+                <div class="row-text">
+                    <div class="row-title">Personal</div>
+                    <div class="row-sub">Mis gastos privados</div>
                 </div>
                 <i class="fas fa-chevron-right" style="color: #C7C7CC;"></i>
             </div>
-            <div class="account-row" onclick="window.app.selectAccount('comun')">
-                <div class="ac-icon" style="background: #5856D6;"><i class="fas fa-users"></i></div>
-                <div style="flex:1;">
-                    <div style="font-weight: 600; font-size: 17px;">Común</div>
-                    <div style="font-size: 14px; color: #8E8E93;">Compartido</div>
+            
+            <div class="ios-row" onclick="app.selectAccount('comun')">
+                <div class="row-icon" style="background: #5856D6;"><i class="fas fa-users"></i></div>
+                <div class="row-text">
+                    <div class="row-title">Común</div>
+                    <div class="row-sub">Compartido con Sandra</div>
                 </div>
                 <i class="fas fa-chevron-right" style="color: #C7C7CC;"></i>
             </div>
         </div>
+
+        <div style="text-align:center; margin-top:40px; opacity:0.5; font-size:12px;">Finanzapps v16.0</div>
     </div>
 
     <div id="view-dashboard" class="view">
-        <div class="header-top">
-            <button class="back-btn" onclick="window.app.goBack()"><i class="fas fa-chevron-left"></i> Cuentas</button>
-            <i class="fas fa-bell" style="color: var(--ios-blue); font-size: 20px;"></i>
-        </div>
-        
-        <div class="balance-card">
-            <div class="balance-label">BALANCE TOTAL</div>
-            <div class="balance-amount" id="total-balance" onclick="window.app.editBalance()">...</div>
+        <div class="nav-bar">
+            <button class="btn-back" onclick="app.goBack()"><i class="fas fa-chevron-left"></i> Cuentas</button>
+            <i class="fas fa-bell" style="color: var(--blue); font-size: 20px;"></i>
         </div>
 
-        <div class="ios-segment">
-            <button id="seg-list" class="segment-btn active" onclick="window.app.toggleView('list')">Movimientos</button>
-            <button id="seg-chart" class="segment-btn" onclick="window.app.toggleView('chart')">Análisis</button>
+        <div class="balance-container">
+            <div class="lbl-balance">Balance Total</div>
+            <div class="hero-balance" id="total-balance" onclick="app.editBalance()">0,00 €</div>
         </div>
 
-        <div id="container-list" class="list-container">
-            <div style="padding: 20px; text-align: center; color: #999;">Cargando...</div>
-        </div>
-        
-        <div id="charts-container">
-            <canvas id="expensesChart"></canvas>
+        <div class="segment">
+            <button id="tab-list" class="seg-btn active" onclick="app.toggleTab('list')">Movimientos</button>
+            <button id="tab-chart" class="seg-btn" onclick="app.toggleTab('chart')">Análisis</button>
         </div>
 
-        <button class="fab" onclick="window.app.openModal()"><i class="fas fa-plus"></i></button>
+        <div id="wrapper-list" class="tx-list">
+            <div class="loader"></div>
+        </div>
+
+        <div id="charts-wrapper">
+            <canvas id="chart-canvas"></canvas>
+        </div>
+
+        <button class="fab" onclick="app.openModal()"><i class="fas fa-plus"></i></button>
     </div>
 
-    <div id="modal-sheet" class="sheet-overlay" onclick="window.app.closeModal(event)">
-        <div class="sheet-content">
-            <div class="sheet-handle"></div>
+    <div id="modal" class="modal-mask" onclick="app.closeModal(event)">
+        <div class="modal-sheet">
+            <div class="sheet-grabber"></div>
             <div style="display:flex; justify-content:space-between; margin-bottom: 20px;">
-                <h3 style="margin:0; font-size:18px;">Nuevo Movimiento</h3>
-                <button onclick="window.app.forceCloseModal()" style="border:none; background:none; color:var(--ios-blue); font-weight:600; font-size:17px;">Cancelar</button>
+                <h3 style="margin:0; font-size:19px;">Nuevo</h3>
+                <button onclick="app.forceClose()" style="border:none; background:none; color:var(--blue); font-size:17px; font-weight:500;">Cancelar</button>
             </div>
-            
-            <form id="transaction-form">
-                <div class="input-group-ios">
-                    <div class="input-row"><label>Cantidad</label><input type="number" id="inp-amount" placeholder="0.00 €" step="0.01" required style="font-size: 20px; font-weight: 600;"></div>
-                    <div class="input-row"><label>Categoría</label><select id="inp-category" required onchange="window.app.checkSub(this)"><option value="" disabled selected>Seleccionar</option></select></div>
-                    <div class="input-row"><label>Fecha</label><input type="date" id="inp-date" required></div>
-                    <div class="input-row"><label>Nota</label><input type="text" id="inp-concept" placeholder="Opcional"></div>
+
+            <form id="form-tx">
+                <div class="form-group">
+                    <div class="form-row">
+                        <label class="form-label">Cantidad</label>
+                        <input type="number" id="inp-amount" class="form-input" placeholder="0.00" step="0.01" required style="font-weight:600; font-size:20px;">
+                    </div>
+                    <div class="form-row">
+                        <label class="form-label">Categoría</label>
+                        <select id="inp-cat" class="form-input" required><option disabled selected>Seleccionar</option></select>
+                    </div>
+                    <div class="form-row">
+                        <label class="form-label">Fecha</label>
+                        <input type="date" id="inp-date" class="form-input" required>
+                    </div>
+                    <div class="form-row">
+                        <label class="form-label">Nota</label>
+                        <input type="text" id="inp-desc" class="form-input" placeholder="Opcional">
+                    </div>
                 </div>
-                <button type="submit" class="btn-enter" style="width:100%; border-radius:12px;">Guardar</button>
+                <button type="submit" class="btn-save">Guardar</button>
             </form>
         </div>
     </div>
 
     <script>
-        // CONFIGURACIÓN FIREBASE
+        // CONFIGURACIÓN FIREBASE (Tus claves reales)
         const firebaseConfig = {
             apiKey: "AIzaSyDriSSF-UpUlJS2rHcjZ7N0dAsPFpPYgm4",
             authDomain: "finanzapps-e2edc.firebaseapp.com",
@@ -214,154 +266,58 @@
             appId: "1:845819455154:web:72fcc69e42209dcd970bab"
         };
 
-        // INICIALIZAR (A prueba de fallos)
+        // INICIALIZACIÓN A PRUEBA DE BOMBAS
+        let db = null;
         try {
             firebase.initializeApp(firebaseConfig);
-            var db = firebase.firestore();
-        } catch(e) {
-            console.error("Error Firebase:", e);
-            alert("Error conectando a la base de datos. Revisa tu conexión.");
+            db = firebase.firestore();
+            console.log("Firebase conectado OK");
+        } catch (e) {
+            console.error("Error iniciando Firebase", e);
+            alert("Modo sin conexión: Los datos no se guardarán en la nube.");
         }
 
-        let myChart = null;
-
-        // APP GLOBAL
-        window.app = {
+        const app = {
             state: {
-                userID: 'usuario_unico_jose', // ID FIJO PARA QUE NO PIDA LOGIN
+                userID: 'jose_m_id_unico', // ID FIJO
                 account: 'personal',
                 unsub: null,
                 balance: 0,
-                txs: []
+                transactions: []
             },
 
-            // 1. ENTRAR (Sin lógica compleja, solo visual)
-            enter: () => {
-                document.getElementById('view-welcome').classList.remove('active');
-                document.getElementById('view-selector').classList.add('active');
-            },
+            // --- NAVEGACIÓN ---
+            selectAccount: (type) => {
+                app.state.account = type;
+                const root = document.documentElement;
+                
+                // Tema de color según cuenta
+                if(type === 'personal') root.style.setProperty('--accent', '#007AFF');
+                else root.style.setProperty('--accent', '#5856D6');
 
-            // 2. CAMBIO DE VISTA GENÉRICO
-            changeView: (id) => {
-                document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
-                document.getElementById(id).classList.add('active');
+                // Cargar saldo local
+                const savedBal = localStorage.getItem(`bal_${type}`);
+                app.state.balance = savedBal ? parseFloat(savedBal) : 0;
+
+                // Cambiar vista
+                document.getElementById('view-selector').classList.remove('active');
+                document.getElementById('view-dashboard').classList.add('active');
+                
+                app.toggleTab('list');
+                app.loadData();
             },
 
             goBack: () => {
-                if(window.app.state.unsub) window.app.state.unsub();
-                window.app.changeView('view-selector');
+                if(app.state.unsub) app.state.unsub();
+                document.getElementById('view-dashboard').classList.remove('active');
+                document.getElementById('view-selector').classList.add('active');
             },
 
-            // 3. SELECCIÓN DE CUENTA
-            selectAccount: (type) => {
-                window.app.state.account = type;
-                
-                // Cargar saldo local
-                const key = `bal_${type}`;
-                window.app.state.balance = parseFloat(localStorage.getItem(key)) || 0;
-
-                window.app.toggleView('list');
-                window.app.changeView('view-dashboard');
-                window.app.loadData();
-            },
-
-            // 4. CARGAR DATOS (FIRESTORE)
-            loadData: () => {
-                const listEl = document.getElementById('container-list');
-                const balEl = document.getElementById('total-balance');
-                listEl.innerHTML = '<div style="padding:20px; text-align:center; color:#999;">Cargando...</div>';
-
-                // Query simple
-                let q = db.collection("transactions");
-                if(window.app.state.account === 'personal') {
-                    q = q.where("type", "==", "personal").where("uid", "==", window.app.state.userID);
-                } else {
-                    q = q.where("type", "==", "comun");
-                }
-
-                window.app.state.unsub = q.onSnapshot((snap) => {
-                    listEl.innerHTML = '';
-                    let total = window.app.state.balance;
-                    let arr = [];
-
-                    if(snap.empty) {
-                        listEl.innerHTML = '<div style="padding:40px; text-align:center; color:#999;">No hay movimientos</div>';
-                        balEl.innerText = new Intl.NumberFormat('es-ES', {style:'currency', currency:'EUR'}).format(total);
-                        return;
-                    }
-
-                    snap.forEach(doc => { let d = doc.data(); d.id = doc.id; arr.push(d); });
-                    arr.sort((a,b) => new Date(b.date) - new Date(a.date));
-                    window.app.state.txs = arr;
-
-                    arr.forEach(t => {
-                        const isExpense = ['gasto_revolut','bitcoin','mapfre','cti','gasolina','crossfit','suscripciones','varios','hipoteca','credito_coche','luz','agua','gas','telefonia','comedor','comida','gastos_extra'].includes(t.category);
-                        if(isExpense) total -= t.amount; else total += t.amount;
-
-                        const icon = window.app.icons[t.category] || 'fa-tag';
-                        const sign = isExpense ? '-' : '+';
-                        const colorClass = isExpense ? 't-red' : 't-green';
-                        
-                        let name = t.category;
-                        // Mapeo simple de nombres
-                        if(window.app.categories.personal.ingresos[t.category]) name = window.app.categories.personal.ingresos[t.category];
-                        if(window.app.categories.personal.gastos[t.category]) name = window.app.categories.personal.gastos[t.category];
-                        if(window.app.categories.comun.ingresos[t.category]) name = window.app.categories.comun.ingresos[t.category];
-                        if(window.app.categories.comun.gastos[t.category]) name = window.app.categories.comun.gastos[t.category];
-
-                        const html = `
-                        <div class="list-item" onclick="window.app.del('${t.id}')">
-                            <div style="display:flex; align-items:center;">
-                                <div style="width:36px; height:36px; background:#007AFF; border-radius:8px; display:flex; align-items:center; justify-content:center; color:white; margin-right:12px;"><i class="fas ${icon}"></i></div>
-                                <div>
-                                    <div style="font-weight:600;">${name}</div>
-                                    <div style="font-size:13px; color:#8E8E93;">${t.concept || t.date}</div>
-                                </div>
-                            </div>
-                            <div style="font-weight:600;" class="${colorClass}">${sign} ${t.amount} €</div>
-                        </div>`;
-                        listEl.insertAdjacentHTML('beforeend', html);
-                    });
-                    
-                    balEl.innerText = new Intl.NumberFormat('es-ES', {style:'currency', currency:'EUR'}).format(total);
-                    if(document.getElementById('charts-container').style.display === 'block') window.app.renderChart();
-                });
-            },
-
-            save: (e) => {
-                e.preventDefault();
-                const amt = parseFloat(document.getElementById('inp-amount').value);
-                const cat = document.getElementById('inp-category').value;
-                const concept = document.getElementById('inp-concept').value;
-                const date = document.getElementById('inp-date').value;
-
-                db.collection("transactions").add({
-                    uid: window.app.state.userID,
-                    type: window.app.state.account,
-                    amount: amt, category: cat, concept: concept, date: date, timestamp: Date.now()
-                }).then(() => {
-                    window.app.forceCloseModal();
-                    e.target.reset();
-                }).catch(err => alert("Error: " + err.message));
-            },
-
-            del: (id) => { if(confirm("¿Borrar?")) db.collection("transactions").doc(id).delete(); },
-
-            editBalance: () => {
-                const val = prompt("Saldo Inicial:", window.app.state.balance);
-                if(val && !isNaN(val)) {
-                    localStorage.setItem(`bal_${window.app.state.account}`, val);
-                    window.app.state.balance = parseFloat(val);
-                    window.app.loadData();
-                }
-            },
-
-            // UI HELPERS
-            toggleView: (mode) => {
-                const list = document.getElementById('container-list');
-                const chart = document.getElementById('charts-container');
-                const b1 = document.getElementById('seg-list');
-                const b2 = document.getElementById('seg-chart');
+            toggleTab: (mode) => {
+                const list = document.getElementById('wrapper-list');
+                const chart = document.getElementById('charts-wrapper');
+                const b1 = document.getElementById('tab-list');
+                const b2 = document.getElementById('tab-chart');
 
                 if(mode === 'list') {
                     list.style.display = 'block'; chart.style.display = 'none';
@@ -369,67 +325,168 @@
                 } else {
                     list.style.display = 'none'; chart.style.display = 'block';
                     b1.classList.remove('active'); b2.classList.add('active');
-                    window.app.renderChart();
+                    app.renderChart();
                 }
             },
 
+            // --- BASE DE DATOS ---
+            loadData: () => {
+                if(!db) return; // Si no hay base de datos, no hacer nada
+                
+                const listEl = document.getElementById('wrapper-list');
+                const balEl = document.getElementById('total-balance');
+                listEl.innerHTML = '<div class="loader"></div>';
+
+                // Query segura
+                let q = db.collection("transactions");
+                if(app.state.account === 'personal') {
+                    q = q.where("type", "==", "personal").where("uid", "==", app.state.userID);
+                } else {
+                    q = q.where("type", "==", "comun");
+                }
+
+                // Listener en tiempo real
+                app.state.unsub = q.onSnapshot((snap) => {
+                    listEl.innerHTML = '';
+                    let total = app.state.balance;
+                    let txs = [];
+
+                    if(snap.empty) {
+                        listEl.innerHTML = '<div style="padding:40px; text-align:center; color:#8E8E93;">Sin movimientos</div>';
+                        balEl.innerText = app.formatMoney(total);
+                        return;
+                    }
+
+                    snap.forEach(doc => { let d = doc.data(); d.id = doc.id; txs.push(d); });
+                    txs.sort((a,b) => new Date(b.date) - new Date(a.date));
+                    app.state.transactions = txs;
+
+                    txs.forEach(t => {
+                        const isExpense = app.isExpense(t.category);
+                        if(isExpense) total -= t.amount; else total += t.amount;
+
+                        const icon = app.getIcon(t.category);
+                        const colorClass = isExpense ? 'red' : 'green';
+                        const sign = isExpense ? '-' : '+';
+                        const name = app.getName(t.category);
+
+                        const html = `
+                        <div class="tx-row" onclick="app.askDelete('${t.id}')">
+                            <div style="display:flex; align-items:center;">
+                                <div class="tx-icon"><i class="fas ${icon}"></i></div>
+                                <div>
+                                    <div style="font-weight:600; font-size:16px;">${name}</div>
+                                    <div style="font-size:13px; color:#8E8E93;">${t.concept || t.date}</div>
+                                </div>
+                            </div>
+                            <div class="tx-amount ${colorClass}">${sign} ${t.amount} €</div>
+                        </div>`;
+                        listEl.insertAdjacentHTML('beforeend', html);
+                    });
+                    
+                    balEl.innerText = app.formatMoney(total);
+                    if(document.getElementById('charts-wrapper').style.display === 'block') app.renderChart();
+                });
+            },
+
+            save: (e) => {
+                e.preventDefault();
+                const amt = parseFloat(document.getElementById('inp-amount').value);
+                const cat = document.getElementById('inp-cat').value;
+                const desc = document.getElementById('inp-desc').value;
+                const date = document.getElementById('inp-date').value;
+
+                db.collection("transactions").add({
+                    uid: app.state.userID,
+                    type: app.state.account,
+                    amount: amt, category: cat, concept: desc, date: date,
+                    timestamp: Date.now()
+                }).then(() => {
+                    app.forceClose();
+                    e.target.reset();
+                }).catch(err => alert("Error guardando: " + err.message));
+            },
+
+            askDelete: (id) => { if(confirm("¿Eliminar?")) db.collection("transactions").doc(id).delete(); },
+
+            editBalance: () => {
+                const val = prompt("Saldo Inicial:", app.state.balance);
+                if(val && !isNaN(val)) {
+                    localStorage.setItem(`bal_${app.state.account}`, val);
+                    app.state.balance = parseFloat(val);
+                    app.loadData();
+                }
+            },
+
+            // --- GRÁFICA ---
             renderChart: () => {
-                const ctx = document.getElementById('expensesChart').getContext('2d');
+                const ctx = document.getElementById('chart-canvas').getContext('2d');
                 const dataMap = {};
-                window.app.state.txs.forEach(t => {
-                    const isExpense = ['gasto_revolut','bitcoin','mapfre','cti','gasolina','crossfit','suscripciones','varios','hipoteca','credito_coche','luz','agua','gas','telefonia','comedor','comida','gastos_extra'].includes(t.category);
-                    if(isExpense) {
-                        let n = t.category; 
-                        if(window.app.categories.personal.gastos[t.category]) n = window.app.categories.personal.gastos[t.category];
-                        n = n.replace(/[^a-zA-ZñÑ\s]/g,'').trim();
+                app.state.transactions.forEach(t => {
+                    if(app.isExpense(t.category)) {
+                        let n = app.getName(t.category);
                         if(!dataMap[n]) dataMap[n]=0; dataMap[n]+=t.amount;
                     }
                 });
 
-                if(myChart) myChart.destroy();
-                myChart = new Chart(ctx, {
+                if(window.myChart) window.myChart.destroy();
+                window.myChart = new Chart(ctx, {
                     type: 'bar',
                     data: {
                         labels: Object.keys(dataMap),
-                        datasets: [{ label: 'Gasto', data: Object.values(dataMap), backgroundColor: '#007AFF', borderRadius: 6 }]
+                        datasets: [{ label: 'Gastos', data: Object.values(dataMap), backgroundColor: app.state.account==='personal'?'#007AFF':'#5856D6', borderRadius: 6 }]
                     },
                     options: { responsive: true, plugins: { legend: {display: false} }, scales: { y: {beginAtZero: true} } }
                 });
             },
 
+            // --- UI TOOLS ---
             openModal: () => {
-                window.app.populateCats();
-                document.getElementById('modal-sheet').classList.add('sheet-open');
-                document.getElementById('modal-sheet').style.display = 'block';
+                app.fillCats();
+                const m = document.getElementById('modal');
+                m.style.display = 'block';
                 document.getElementById('inp-date').valueAsDate = new Date();
+                setTimeout(() => m.classList.add('modal-open'), 10);
             },
-            closeModal: (e) => { if(e.target.id === 'modal-sheet') window.app.forceCloseModal(); },
-            forceCloseModal: () => { document.getElementById('modal-sheet').classList.remove('sheet-open'); setTimeout(() => document.getElementById('modal-sheet').style.display = 'none', 300); },
-
-            populateCats: () => {
-                const sel = document.getElementById('inp-category');
-                sel.innerHTML = '<option value="" disabled selected>Seleccionar</option>';
-                const cats = window.app.categories[window.app.state.account];
-                let g1 = document.createElement('optgroup'); g1.label = "Ingresos";
-                for(const [k,v] of Object.entries(cats.ingresos)) { let o = document.createElement('option'); o.value=k; o.innerText=v; g1.appendChild(o); }
-                sel.appendChild(g1);
-                let g2 = document.createElement('optgroup'); g2.label = "Gastos";
-                for(const [k,v] of Object.entries(cats.gastos)) { let o = document.createElement('option'); o.value=k; o.innerText=v; g2.appendChild(o); }
-                sel.appendChild(g2);
+            closeModal: (e) => { if(e.target.id === 'modal') app.forceClose(); },
+            forceClose: () => {
+                const m = document.getElementById('modal');
+                m.classList.remove('modal-open');
+                setTimeout(() => m.style.display = 'none', 300);
             },
-            checkSub: (sel) => {
-                const inp = document.getElementById('inp-concept');
-                if(['suscripciones','gastos_extra'].includes(sel.value)) { inp.placeholder = "Concepto obligatorio"; inp.required = true; inp.focus(); } else { inp.placeholder = "Opcional"; inp.required = false; }
+            fillCats: () => {
+                const s = document.getElementById('inp-cat');
+                s.innerHTML = '<option disabled selected>Seleccionar</option>';
+                const cats = app.cats[app.state.account];
+                let g1 = document.createElement('optgroup'); g1.label="INGRESOS";
+                for(let [k,v] of Object.entries(cats.in)) { let o=document.createElement('option'); o.value=k; o.text=v; g1.appendChild(o); }
+                s.appendChild(g1);
+                let g2 = document.createElement('optgroup'); g2.label="GASTOS";
+                for(let [k,v] of Object.entries(cats.out)) { let o=document.createElement('option'); o.value=k; o.text=v; g2.appendChild(o); }
+                s.appendChild(g2);
             },
-
-            categories: {
-                personal: { ingresos: { nomina: '💰 Nómina', ingreso_extra: '💵 Ingreso Extra' }, gastos: { aporte_comun: '🏠 Aporte Común', ahorro_revolut: '🐷 Ahorro', gasto_revolut: '💳 Gasto', bitcoin: '₿ Crypto', mapfre: '🛡️ Seguro', cti: '💳 Tarjeta CTI', gasolina: '⛽ Gasolina', crossfit: '🏋️ Crossfit', suscripciones: '📺 Suscripciones', varios: '🛒 Varios' } },
-                comun: { ingresos: { aporte_jose: '👨🏻 Aporte Jose', aporte_sandra: '👩🏼 Aporte Sandra', aporte_extra: '💵 Extra' }, gastos: { hipoteca: '🏠 Hipoteca', credito_coche: '🚗 Coche', luz: '⚡ Luz', agua: '💧 Agua', gas: '🔥 Gas', telefonia: '📱 Internet', comedor: '🍽️ Comedor', comida: '🛒 Supermercado', suscripciones: '📺 Suscripciones', gastos_extra: '💸 Otros' } }
+            formatMoney: (n) => new Intl.NumberFormat('es-ES', {style:'currency', currency:'EUR'}).format(n),
+            
+            // --- DATA HELPERS ---
+            cats: {
+                personal: {
+                    in: { nomina: 'Nómina', extra: 'Ingreso Extra' },
+                    out: { comun: 'Aporte Común', ahorro: 'Ahorro', ocio: 'Ocio', super: 'Súper', varios: 'Varios' }
+                },
+                comun: {
+                    in: { aporte_jose: 'Aporte Jose', aporte_sandra: 'Aporte Sandra' },
+                    out: { hipoteca: 'Hipoteca', luz: 'Luz/Agua', comida: 'Comida', ocio: 'Cena/Ocio', otros: 'Otros' }
+                }
             },
-            icons: { nomina: 'fa-money-bill-wave', ingreso_extra: 'fa-hand-holding-usd', aporte_comun: 'fa-exchange-alt', ahorro_revolut: 'fa-piggy-bank', gasto_revolut: 'fa-credit-card', bitcoin: 'fa-bitcoin', mapfre: 'fa-shield-alt', cti: 'fa-id-card', gasolina: 'fa-gas-pump', crossfit: 'fa-dumbbell', varios: 'fa-shopping-cart', aporte_jose: 'fa-user-plus', aporte_sandra: 'fa-user-plus', aporte_extra: 'fa-plus-circle', hipoteca: 'fa-home', credito_coche: 'fa-car', luz: 'fa-bolt', agua: 'fa-tint', gas: 'fa-fire', telefonia: 'fa-wifi', comedor: 'fa-utensils', comida: 'fa-shopping-basket', suscripciones: 'fa-tv', gastos_extra: 'fa-receipt' }
+            isExpense: (c) => ['comun','ahorro','ocio','super','varios','hipoteca','luz','comida','otros'].includes(c),
+            getIcon: (c) => ({ nomina:'fa-money-bill', comun:'fa-house-user', hipoteca:'fa-home', luz:'fa-bolt', comida:'fa-utensils' }[c] || 'fa-tag'),
+            getName: (c) => {
+                const all = {...app.cats.personal.in, ...app.cats.personal.out, ...app.cats.comun.in, ...app.cats.comun.out};
+                return all[c] || c;
+            }
         };
 
-        document.getElementById('transaction-form').addEventListener('submit', window.app.save);
+        document.getElementById('form-tx').addEventListener('submit', app.save);
     </script>
 </body>
 </html>
