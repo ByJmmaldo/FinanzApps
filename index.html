@@ -15,115 +15,113 @@
 
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
 
     <style>
         :root {
-            --ios-bg: #F2F2F7; --ios-card: #FFFFFF; --ios-text: #000000; --ios-text-secondary: #8E8E93;
-            --ios-blue: #007AFF; --ios-red: #FF3B30; --ios-green: #34C759; --ios-separator: #C6C6C8;
+            --ios-bg: #F2F2F7; --ios-blue: #007AFF; --ios-red: #FF3B30; --ios-green: #34C759;
             --brand-personal: #007AFF; --brand-sandra: #FF2D55; --brand-common: #5856D6;
             --accent-color: var(--brand-personal); --radius: 12px;
         }
         * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; }
-        body { background-color: var(--ios-bg); margin: 0; padding: 0; color: var(--ios-text); height: 100vh; overflow: hidden; padding-top: env(safe-area-inset-top); padding-bottom: env(safe-area-inset-bottom); }
-        .view { display: none; width: 100%; height: 100%; overflow-y: auto; position: absolute; top: 0; left: 0; background: var(--ios-bg); animation: fadeIn 0.2s ease-in-out; }
+        body { background-color: var(--ios-bg); margin: 0; padding: 0; height: 100vh; overflow: hidden; padding-top: env(safe-area-inset-top); padding-bottom: env(safe-area-inset-bottom); }
+        .view { display: none; width: 100%; height: 100%; overflow-y: auto; position: absolute; top: 0; left: 0; background: var(--ios-bg); }
         .view.active { display: block; }
-        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
 
-        /* LOGIN */
-        #view-login { background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%); display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 9999; }
-        .app-icon { width: 80px; height: 80px; background: white; border-radius: 18px; display: flex; align-items: center; justify-content: center; font-size: 40px; color: #333; box-shadow: 0 10px 20px rgba(0,0,0,0.1); margin-bottom: 20px; }
-        .ios-input { background: white; border: 1px solid #d1d1d6; border-radius: 10px; padding: 12px; width: 280px; font-size: 16px; margin-bottom: 15px; outline: none; }
-        .ios-btn { background: var(--ios-blue); color: white; border: none; padding: 12px; width: 280px; border-radius: 10px; font-size: 17px; font-weight: 600; cursor: pointer; }
-        .auth-link { margin-top: 20px; color: var(--ios-blue); font-size: 14px; cursor: pointer; text-decoration: underline; padding: 10px; }
+        /* PANTALLA BIENVENIDA SIMPLE */
+        #view-login { display: flex; flex-direction: column; align-items: center; justify-content: center; background: white; }
+        .user-btn {
+            width: 80%; padding: 20px; margin: 10px; border-radius: 15px; border: none;
+            font-size: 18px; font-weight: 600; color: white; cursor: pointer;
+            display: flex; align-items: center; justify-content: center; gap: 10px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+        }
 
-        /* INTERFAZ */
-        .ios-header { padding: 20px 20px 10px 20px; background: var(--ios-bg); position: sticky; top: 0; z-index: 100; }
-        .header-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
-        .back-btn { color: var(--ios-blue); font-size: 17px; background: none; border: none; padding: 0; display: flex; align-items: center; gap: 5px; cursor: pointer;}
-        .header-title { font-size: 34px; font-weight: 800; margin: 0; letter-spacing: -0.5px; }
-        .header-subtitle { font-size: 13px; color: var(--ios-text-secondary); text-transform: uppercase; font-weight: 600; margin-top: 10px;}
-        .balance-amount { font-size: 32px; font-weight: 700; cursor: pointer;}
+        /* HEADER */
+        .ios-header { padding: 20px; background: var(--ios-bg); position: sticky; top: 0; z-index: 100; }
+        .header-top { display: flex; justify-content: space-between; align-items: center; }
+        .back-btn { color: var(--ios-blue); font-size: 17px; background: none; border: none; display: flex; align-items: center; gap: 5px; cursor: pointer; }
+        .balance-amount { font-size: 34px; font-weight: 700; margin-top: 5px; cursor: pointer; }
+        
+        /* UI */
         .ios-segment { background: #E5E5EA; border-radius: 9px; padding: 2px; display: flex; margin: 15px 20px; }
-        .segment-btn { flex: 1; border: none; background: transparent; padding: 6px; border-radius: 7px; font-size: 13px; font-weight: 600; transition: all 0.2s; cursor: pointer; }
+        .segment-btn { flex: 1; border: none; background: transparent; padding: 6px; border-radius: 7px; font-size: 13px; font-weight: 600; }
         .segment-btn.active { background: white; box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
-        .ios-list { margin: 0 20px 100px 20px; background: white; border-radius: 12px; overflow: hidden; }
-        .list-item { display: flex; align-items: center; justify-content: space-between; padding: 12px 16px; border-bottom: 1px solid var(--ios-separator); cursor: pointer; }
-        .list-item:active { background: #F2F2F7; }
-        .list-item:last-child { border-bottom: none; }
-        .item-icon { width: 36px; height: 36px; border-radius: 8px; background: var(--accent-color); display: flex; align-items: center; justify-content: center; color: white; font-size: 16px; margin-right: 12px; }
-        .item-title { font-size: 16px; font-weight: 600; }
-        .item-sub { font-size: 13px; color: var(--ios-text-secondary); }
-        .item-amount { font-size: 16px; font-weight: 600; }
-        .t-red { color: var(--ios-text); } .t-green { color: var(--ios-green); }
-        .account-selector-list { margin: 20px; border-radius: 12px; overflow: hidden; }
-        .account-row { background: white; padding: 20px; display: flex; align-items: center; border-bottom: 1px solid var(--ios-separator); cursor: pointer; }
-        .fab { position: fixed; bottom: 40px; right: 20px; width: 56px; height: 56px; border-radius: 50%; background: var(--accent-color); color: white; border: none; box-shadow: 0 4px 15px rgba(0,0,0,0.3); font-size: 24px; display: flex; align-items: center; justify-content: center; z-index: 200; cursor: pointer;}
-        .sheet-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.4); z-index: 1000; backdrop-filter: blur(2px); }
-        .sheet-content { position: fixed; bottom: 0; left: 0; width: 100%; background: #F2F2F7; border-top-left-radius: 15px; border-top-right-radius: 15px; padding: 20px; padding-bottom: 50px; transform: translateY(100%); transition: transform 0.3s cubic-bezier(0.2, 0.8, 0.2, 1); }
+        
+        .account-row { background: white; padding: 20px; display: flex; align-items: center; border-bottom: 1px solid #C6C6C8; cursor: pointer; margin: 0 20px; }
+        .account-row:first-child { border-top-left-radius: 12px; border-top-right-radius: 12px; }
+        .account-row:last-child { border-bottom-left-radius: 12px; border-bottom-right-radius: 12px; border-bottom: none; }
+        
+        .list-item { display: flex; justify-content: space-between; padding: 15px; background: white; border-bottom: 1px solid #eee; cursor: pointer; }
+        .list-container { margin: 0 20px 100px 20px; border-radius: 12px; overflow: hidden; }
+        
+        .fab { position: fixed; bottom: 40px; right: 20px; width: 56px; height: 56px; border-radius: 50%; background: var(--accent-color); color: white; border: none; box-shadow: 0 4px 15px rgba(0,0,0,0.3); font-size: 24px; z-index: 200; cursor: pointer; }
+
+        /* MODAL */
+        .sheet-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.4); z-index: 1000; }
+        .sheet-content { position: fixed; bottom: 0; width: 100%; background: #F2F2F7; border-top-left-radius: 15px; border-top-right-radius: 15px; padding: 20px; padding-bottom: 50px; transform: translateY(100%); transition: transform 0.3s; }
         .sheet-open .sheet-content { transform: translateY(0); }
-        .sheet-handle { width: 40px; height: 5px; background: #C5C5C7; border-radius: 3px; margin: 0 auto 20px auto; }
-        .input-group-ios { background: white; border-radius: 10px; overflow: hidden; margin-bottom: 20px; }
-        .input-row { display: flex; align-items: center; padding: 0 15px; border-bottom: 1px solid #E5E5EA; height: 50px; }
-        .input-row:last-child { border-bottom: none; }
-        .input-row label { width: 100px; font-size: 16px; font-weight: 500; }
-        .input-row input, .input-row select { flex: 1; border: none; font-size: 16px; background: transparent; outline: none; text-align: right; color: var(--ios-blue); }
-        .loader { width: 20px; height: 20px; border: 2px solid #ccc; border-top-color: #333; border-radius: 50%; animation: spin 1s linear infinite; margin: 0 auto; }
-        @keyframes spin { 100% { transform: rotate(360deg); } }
-        #charts-container { padding: 20px; background: white; border-radius: 12px; margin: 0 20px; display: none;}
-        .empty-state { text-align: center; color: #8E8E93; margin-top: 40px; }
+        
+        .input-group { background: white; border-radius: 10px; overflow: hidden; margin-bottom: 20px; }
+        .input-row { display: flex; padding: 15px; border-bottom: 1px solid #eee; align-items: center; }
+        .input-row input, .input-row select { flex: 1; border: none; text-align: right; font-size: 16px; background: transparent; outline: none; color: var(--ios-blue); }
+        
+        .t-red { color: black; } .t-green { color: var(--ios-green); }
+        #charts-container { padding: 20px; background: white; border-radius: 12px; margin: 0 20px; display: none; }
     </style>
 </head>
 <body>
 
-    <div id="view-login" class="view active" style="display: flex;">
-        <div class="app-icon"><i class="fas fa-wallet"></i></div>
-        <h2 style="margin-bottom: 5px;">Finanzapps</h2>
-        <p style="color: #666; margin-bottom: 30px;">V12.0 Local Fix</p>
+    <div id="view-login" class="view active">
+        <h2 style="margin-bottom: 40px; font-size: 28px;">¿Quién eres?</h2>
         
-        <form id="auth-form" style="display:flex; flex-direction:column; align-items:center;">
-            <input type="email" id="email" class="ios-input" placeholder="Email" required>
-            <input type="password" id="password" class="ios-input" placeholder="Contraseña" required>
-            <button type="submit" class="ios-btn" id="btn-auth-action">
-                <span id="btn-text">Iniciar Sesión</span>
-                <div class="loader" id="auth-loader" style="display:none; border-color:rgba(255,255,255,0.5); border-top-color:white;"></div>
-            </button>
-            <div class="auth-link" onclick="app.toggleAuthMode()">
-                <span id="toggle-text">¿No tienes cuenta? Regístrate aquí</span>
-            </div>
-        </form>
+        <button class="user-btn" style="background: var(--brand-personal);" onclick="app.login('Jose')">
+            <i class="fas fa-user"></i> Soy Jose M.
+        </button>
+        
+        <button class="user-btn" style="background: var(--brand-sandra);" onclick="app.login('Sandra')">
+            <i class="fas fa-user"></i> Soy Sandra
+        </button>
     </div>
 
     <div id="view-selector" class="view">
         <div class="ios-header">
-            <h1 class="header-title">Cuentas</h1>
-            <p style="color: var(--ios-text-secondary); margin-top: 5px;">Hola, <span id="user-name-display">Usuario</span></p>
+            <h1 style="margin: 0; font-size: 34px;">Cuentas</h1>
+            <p style="color: #8E8E93; margin-top: 5px;">Hola, <span id="lbl-username">...</span></p>
         </div>
-        <div class="account-selector-list">
+        
+        <div style="margin-top: 20px;">
             <div class="account-row" onclick="app.selectAccount('personal')">
-                <div class="item-icon" id="icon-personal" style="background: var(--brand-personal);"><i class="fas fa-user"></i></div>
-                <div style="flex:1;"><div style="font-weight: 600; font-size: 17px;">Personal</div><div style="font-size: 14px; color: #8E8E93;">Mis gastos privados</div></div>
-                <i class="fas fa-chevron-right" style="color: #C7C7CC;"></i>
+                <div style="width: 40px; height: 40px; background: var(--brand-personal); border-radius: 8px; display:flex; align-items:center; justify-content:center; color:white; margin-right:15px;" id="icon-personal"><i class="fas fa-user"></i></div>
+                <div style="flex:1;">
+                    <div style="font-weight:600; font-size:17px;">Personal</div>
+                    <div style="font-size:14px; color:#8E8E93;">Mis gastos</div>
+                </div>
+                <i class="fas fa-chevron-right" style="color:#C7C7CC;"></i>
             </div>
+            
             <div class="account-row" onclick="app.selectAccount('comun')">
-                <div class="item-icon" style="background: var(--brand-common);"><i class="fas fa-users"></i></div>
-                <div style="flex:1;"><div style="font-weight: 600; font-size: 17px;">Común</div><div style="font-size: 14px; color: #8E8E93;">Compartido</div></div>
-                <i class="fas fa-chevron-right" style="color: #C7C7CC;"></i>
+                <div style="width: 40px; height: 40px; background: var(--brand-common); border-radius: 8px; display:flex; align-items:center; justify-content:center; color:white; margin-right:15px;"><i class="fas fa-users"></i></div>
+                <div style="flex:1;">
+                    <div style="font-weight:600; font-size:17px;">Común</div>
+                    <div style="font-size:14px; color:#8E8E93;">Compartida</div>
+                </div>
+                <i class="fas fa-chevron-right" style="color:#C7C7CC;"></i>
             </div>
         </div>
-        <div style="text-align: center; margin-top: 40px;">
-            <button onclick="app.logout()" style="color: var(--ios-red); border:none; background:none; font-size: 16px;">Cerrar Sesión</button>
+        
+        <div style="text-align: center; margin-top: 50px;">
+            <button onclick="app.logout()" style="color: #FF3B30; border:none; background:none; font-size: 16px;">Cambiar Usuario</button>
         </div>
     </div>
 
     <div id="view-dashboard" class="view">
         <div class="ios-header">
             <div class="header-top">
-                <button class="back-btn" onclick="app.goBack()"><i class="fas fa-chevron-left"></i> <span id="lbl-account-name">Atrás</span></button>
-                <i class="fas fa-bell" style="color: var(--ios-blue); font-size: 20px;" onclick="alert('Notificaciones: Sin novedades')"></i>
+                <button class="back-btn" onclick="app.goBack()"><i class="fas fa-chevron-left"></i> Atrás</button>
+                <i class="fas fa-bell" style="color: var(--ios-blue); font-size: 20px;" onclick="alert('Sin notificaciones')"></i>
             </div>
-            <div class="header-subtitle">BALANCE TOTAL</div>
-            <div class="balance-amount" id="total-balance" onclick="app.editInitialBalance()">...</div>
+            <div style="font-size: 13px; color: #8E8E93; margin-top: 10px; font-weight: 600;">BALANCE TOTAL</div>
+            <div class="balance-amount" id="total-balance" onclick="app.editBalance()">...</div>
         </div>
 
         <div class="ios-segment">
@@ -131,32 +129,53 @@
             <button id="seg-chart" class="segment-btn" onclick="app.toggleView('chart')">Análisis</button>
         </div>
 
-        <div id="container-list" class="ios-list"><div class="empty-state">Cargando...</div></div>
-        <div id="container-chart" style="display: none;"><div id="charts-container"><canvas id="expensesChart"></canvas></div></div>
+        <div id="container-list" class="list-container">
+            <div style="padding: 20px; text-align: center; color: #999;">Cargando...</div>
+        </div>
+        
+        <div id="charts-container">
+            <canvas id="expensesChart"></canvas>
+        </div>
 
         <button class="fab" onclick="app.openModal()"><i class="fas fa-plus"></i></button>
     </div>
 
     <div id="modal-sheet" class="sheet-overlay" onclick="app.closeModal(event)">
         <div class="sheet-content">
-            <div class="sheet-handle"></div>
-            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 20px;">
+            <div style="width: 40px; height: 5px; background: #C5C5C7; border-radius: 3px; margin: 0 auto 20px auto;"></div>
+            <div style="display:flex; justify-content:space-between; margin-bottom: 20px;">
                 <h3 style="margin:0;">Nuevo Movimiento</h3>
-                <button onclick="app.forceCloseModal()" style="border:none; background:none; color:var(--ios-blue); font-weight:600; font-size:17px;">Cancelar</button>
+                <button onclick="app.forceCloseModal()" style="border:none; background:none; color:var(--ios-blue); font-size:17px;">Cancelar</button>
             </div>
+            
             <form id="transaction-form">
-                <div class="input-group-ios">
-                    <div class="input-row"><label>Cantidad</label><input type="number" id="inp-amount" placeholder="0.00 €" step="0.01" inputmode="decimal" required style="font-size: 20px; font-weight: 600;"></div>
-                    <div class="input-row"><label>Categoría</label><select id="inp-category" required onchange="app.checkSub(this)"><option value="" disabled selected>Seleccionar</option></select></div>
-                    <div class="input-row"><label>Fecha</label><input type="date" id="inp-date" required></div>
-                    <div class="input-row"><label>Nota</label><input type="text" id="inp-concept" placeholder="Opcional"></div>
+                <div class="input-group">
+                    <div class="input-row">
+                        <label style="width:100px;">Cantidad</label>
+                        <input type="number" id="inp-amount" placeholder="0.00 €" step="0.01" inputmode="decimal" required style="font-size:20px; font-weight:600;">
+                    </div>
+                    <div class="input-row">
+                        <label style="width:100px;">Categoría</label>
+                        <select id="inp-category" required onchange="app.checkSub(this)">
+                            <option value="" disabled selected>Seleccionar</option>
+                        </select>
+                    </div>
+                    <div class="input-row">
+                        <label style="width:100px;">Fecha</label>
+                        <input type="date" id="inp-date" required>
+                    </div>
+                    <div class="input-row">
+                        <label style="width:100px;">Nota</label>
+                        <input type="text" id="inp-concept" placeholder="Opcional">
+                    </div>
                 </div>
-                <button type="submit" class="ios-btn" style="width:100%; background: var(--accent-color);">Guardar</button>
+                <button type="submit" style="width:100%; padding:15px; background:var(--accent-color); color:white; border:none; border-radius:12px; font-size:17px; font-weight:600;">Guardar</button>
             </form>
         </div>
     </div>
 
     <script>
+        // CONFIGURACIÓN FIREBASE
         const firebaseConfig = {
             apiKey: "AIzaSyDriSSF-UpUlJS2rHcjZ7N0dAsPFpPYgm4",
             authDomain: "finanzapps-e2edc.firebaseapp.com",
@@ -168,101 +187,87 @@
 
         firebase.initializeApp(firebaseConfig);
         const db = firebase.firestore();
-        const auth = firebase.auth();
         let myChart = null;
 
         const app = {
-            state: { user: null, currentAccount: 'personal', isRegistering: false, unsubscribe: null, initialBalance: 0, transactions: [] },
+            state: {
+                currentUser: null, // 'Jose' o 'Sandra'
+                currentAccount: 'personal', 
+                unsubscribe: null,
+                initialBalance: 0,
+                transactions: []
+            },
 
             init: () => {
-                // Forzar persistencia LOCAL (Arregla el fallo en archivos locales)
-                auth.setPersistence(firebase.auth.Auth.Persistence.LOCAL);
-
-                auth.onAuthStateChanged((user) => {
-                    if(user) {
-                        app.state.user = user;
-                        document.getElementById('user-name-display').innerText = user.email.split('@')[0];
-                        app.changeView('view-selector');
-                    } else {
-                        app.changeView('view-login');
-                    }
-                });
-                document.getElementById('auth-form').addEventListener('submit', app.handleAuth);
+                // Verificar si ya había entrado antes (recordar usuario)
+                const savedUser = localStorage.getItem('activeUser');
+                if (savedUser) {
+                    app.login(savedUser);
+                } else {
+                    app.changeView('view-login');
+                }
+                
                 document.getElementById('transaction-form').addEventListener('submit', app.saveData);
             },
 
-            toggleAuthMode: () => {
-                const s = app.state; s.isRegistering = !s.isRegistering;
-                document.getElementById('btn-text').innerText = s.isRegistering ? "Crear Cuenta" : "Iniciar Sesión";
-                document.getElementById('toggle-text').innerText = s.isRegistering ? "¿Ya tienes cuenta? Pulsa aquí" : "¿No tienes cuenta? Regístrate aquí";
+            login: (user) => {
+                app.state.currentUser = user;
+                localStorage.setItem('activeUser', user); // Guardar sesión localmente
+                document.getElementById('lbl-username').innerText = user;
+                
+                // Personalizar color
+                const iconP = document.getElementById('icon-personal');
+                if (user === 'Sandra') {
+                    document.documentElement.style.setProperty('--brand-personal', '#FF2D55');
+                    iconP.style.background = '#FF2D55';
+                } else {
+                    document.documentElement.style.setProperty('--brand-personal', '#007AFF');
+                    iconP.style.background = '#007AFF';
+                }
+                
+                app.changeView('view-selector');
             },
 
-            handleAuth: (e) => {
-                e.preventDefault();
-                const email = document.getElementById('email').value;
-                const pass = document.getElementById('password').value;
-                const loader = document.getElementById('auth-loader');
-                const btnTxt = document.getElementById('btn-text');
-                
-                loader.style.display = 'block'; btnTxt.style.display = 'none';
-                
-                // TIMEOUT DE SEGURIDAD (Si tarda más de 8 segs, avisa)
-                const timeout = setTimeout(() => {
-                    if(loader.style.display === 'block') {
-                        loader.style.display = 'none'; btnTxt.style.display = 'block';
-                        alert("⚠️ Tiempo de espera agotado.\nComprueba tu conexión a internet.");
-                    }
-                }, 8000);
-
-                const action = app.state.isRegistering 
-                    ? auth.createUserWithEmailAndPassword(email, pass)
-                    : auth.signInWithEmailAndPassword(email, pass);
-
-                action
-                .then(() => {
-                    clearTimeout(timeout);
-                    // Login correcto - onAuthStateChanged hará el resto
-                })
-                .catch(err => {
-                    clearTimeout(timeout);
-                    let msg = err.message;
-                    if(err.code === 'auth/email-already-in-use') msg = "¡Ese email ya está registrado!\nPrueba a Iniciar Sesión.";
-                    if(err.code === 'auth/wrong-password') msg = "Contraseña incorrecta.";
-                    if(err.code === 'auth/user-not-found') msg = "Usuario no encontrado.\nRegístrate primero.";
-                    
-                    alert("❌ " + msg);
-                    loader.style.display = 'none'; btnTxt.style.display = 'block';
-                });
+            logout: () => {
+                localStorage.removeItem('activeUser');
+                if(app.state.unsubscribe) app.state.unsubscribe();
+                app.changeView('view-login');
             },
-
-            logout: () => { auth.signOut(); if(app.state.unsubscribe) app.state.unsubscribe(); },
 
             changeView: (id) => {
                 document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
                 document.getElementById(id).classList.add('active');
             },
-            goBack: () => { if(app.state.unsubscribe) app.state.unsubscribe(); app.changeView('view-selector'); },
+            goBack: () => { 
+                if(app.state.unsubscribe) app.state.unsubscribe(); 
+                app.changeView('view-selector'); 
+            },
 
             selectAccount: (type) => {
                 app.state.currentAccount = type;
                 const root = document.documentElement;
-                const isSandra = app.state.user.email.toLowerCase().includes('sandra');
+                
                 if(type === 'personal') {
-                    const color = isSandra ? 'var(--brand-sandra)' : 'var(--brand-personal)';
-                    root.style.setProperty('--accent-color', color);
-                    document.getElementById('lbl-account-name').innerText = "Cuentas";
+                    root.style.setProperty('--accent-color', app.state.currentUser === 'Sandra' ? 'var(--brand-sandra)' : 'var(--brand-personal)');
                 } else {
                     root.style.setProperty('--accent-color', 'var(--brand-common)');
-                    document.getElementById('lbl-account-name').innerText = "Cuentas";
                 }
-                const key = `bal_${app.state.user.uid}_${type}`;
+
+                // Balance Local
+                const key = `bal_${app.state.currentUser}_${type}`;
                 app.state.initialBalance = parseFloat(localStorage.getItem(key)) || 0;
-                app.toggleView('list'); app.changeView('view-dashboard'); app.listenToData();
+
+                app.toggleView('list');
+                app.changeView('view-dashboard');
+                app.listenToData();
             },
 
             toggleView: (mode) => {
-                const list = document.getElementById('container-list'); const chart = document.getElementById('container-chart');
-                const btnList = document.getElementById('seg-list'); const btnChart = document.getElementById('seg-chart');
+                const list = document.getElementById('container-list');
+                const chart = document.getElementById('charts-container');
+                const btnList = document.getElementById('seg-list');
+                const btnChart = document.getElementById('seg-chart');
+
                 if(mode === 'list') {
                     list.style.display = 'block'; chart.style.display = 'none';
                     btnList.classList.add('active'); btnChart.classList.remove('active');
@@ -274,44 +279,67 @@
             },
 
             listenToData: () => {
-                const listEl = document.getElementById('container-list'); const totalEl = document.getElementById('total-balance');
-                listEl.innerHTML = '<div class="empty-state"><div class="loader" style="border-color:#ccc; border-top-color:#333;"></div></div>';
+                const listEl = document.getElementById('container-list');
+                const totalEl = document.getElementById('total-balance');
+                listEl.innerHTML = '<div style="padding:20px; text-align:center; color:#999;">Cargando...</div>';
+
                 let query = db.collection("transactions");
-                if(app.state.currentAccount === 'personal') query = query.where("type", "==", "personal").where("uid", "==", app.state.user.uid);
-                else query = query.where("type", "==", "comun");
+                
+                // FILTROS SIMPLES POR NOMBRE
+                if(app.state.currentAccount === 'personal') {
+                    // Solo personal y del usuario actual
+                    query = query.where("type", "==", "personal").where("owner", "==", app.state.currentUser);
+                } else {
+                    // Todo lo común
+                    query = query.where("type", "==", "comun");
+                }
 
                 app.state.unsubscribe = query.onSnapshot((snapshot) => {
-                    listEl.innerHTML = ''; let balance = app.state.initialBalance; const txs = [];
+                    listEl.innerHTML = '';
+                    let balance = app.state.initialBalance;
+                    const txs = [];
+
                     if(snapshot.empty) {
-                        listEl.innerHTML = '<div class="empty-state">Sin movimientos</div>';
+                        listEl.innerHTML = '<div style="padding:40px; text-align:center; color:#999;">No hay movimientos</div>';
                         totalEl.innerText = new Intl.NumberFormat('es-ES', {style:'currency', currency:'EUR'}).format(balance);
                         return;
                     }
+
                     snapshot.forEach(doc => { const d = doc.data(); d.id = doc.id; txs.push(d); });
+                    
                     txs.sort((a,b) => new Date(b.date) - new Date(a.date));
                     app.state.transactions = txs;
+
                     txs.forEach(t => {
+                        // Lógica gasto/ingreso
                         const isExpense = ['gasto_revolut','bitcoin','mapfre','cti','gasolina','crossfit','suscripciones','varios','hipoteca','credito_coche','luz','agua','gas','telefonia','comedor','comida','gastos_extra'].includes(t.category);
                         if(isExpense) balance -= t.amount; else balance += t.amount;
+
                         const icon = app.icons[t.category] || 'fa-tag';
                         const colorClass = isExpense ? 't-red' : 't-green';
                         const sign = isExpense ? '-' : '+';
+                        
                         let catName = t.category;
                         const accCats = app.categories[app.state.currentAccount];
                         if(accCats.ingresos[t.category]) catName = accCats.ingresos[t.category];
                         else if(accCats.gastos[t.category]) catName = accCats.gastos[t.category];
+
                         const html = `
                         <div class="list-item" onclick="app.askDelete('${t.id}')">
                             <div style="display:flex; align-items:center;">
-                                <div class="item-icon"><i class="fas ${icon}"></i></div>
-                                <div><div class="item-title">${catName}</div><div class="item-sub">${t.concept || t.date}</div></div>
+                                <div style="width:36px; height:36px; background:var(--accent-color); border-radius:8px; display:flex; align-items:center; justify-content:center; color:white; margin-right:12px;"><i class="fas ${icon}"></i></div>
+                                <div>
+                                    <div style="font-weight:600;">${catName}</div>
+                                    <div style="font-size:13px; color:#8E8E93;">${t.concept || t.date}</div>
+                                </div>
                             </div>
-                            <div class="item-amount ${colorClass}">${sign} ${t.amount} €</div>
+                            <div style="font-weight:600;" class="${colorClass}">${sign} ${t.amount} €</div>
                         </div>`;
                         listEl.insertAdjacentHTML('beforeend', html);
                     });
+                    
                     totalEl.innerText = new Intl.NumberFormat('es-ES', {style:'currency', currency:'EUR'}).format(balance);
-                    if(document.getElementById('container-chart').style.display === 'block') app.renderChart();
+                    if(document.getElementById('charts-container').style.display === 'block') app.renderChart();
                 });
             },
 
@@ -321,18 +349,22 @@
                 const cat = document.getElementById('inp-category').value;
                 const concept = document.getElementById('inp-concept').value;
                 const date = document.getElementById('inp-date').value;
+
                 db.collection("transactions").add({
-                    uid: app.state.user.uid, userEmail: app.state.user.email, type: app.state.currentAccount,
-                    amount: amt, category: cat, concept: concept, date: date, timestamp: Date.now()
-                }).then(() => { app.forceCloseModal(); e.target.reset(); }).catch(err => alert("Error: " + err.message));
+                    owner: app.state.currentUser, // 'Jose' o 'Sandra'
+                    type: app.state.currentAccount,
+                    amount: amt, category: cat, concept: concept, date: date,
+                    timestamp: Date.now()
+                }).then(() => { app.forceCloseModal(); e.target.reset(); })
+                .catch(err => alert("Error: " + err.message));
             },
 
-            askDelete: (id) => { if(confirm("¿Eliminar movimiento?")) db.collection("transactions").doc(id).delete(); },
+            askDelete: (id) => { if(confirm("¿Borrar movimiento?")) db.collection("transactions").doc(id).delete(); },
 
-            editInitialBalance: () => {
+            editBalance: () => {
                 const val = prompt("Saldo Inicial (Base):", app.state.initialBalance);
                 if(val && !isNaN(val)) {
-                    const key = `bal_${app.state.user.uid}_${app.state.currentAccount}`;
+                    const key = `bal_${app.state.currentUser}_${app.state.currentAccount}`;
                     localStorage.setItem(key, val);
                     app.state.initialBalance = parseFloat(val);
                     app.listenToData();
