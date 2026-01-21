@@ -17,21 +17,12 @@
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
 
     <style>
-        /* --- ESTILOS iOS (RECUPERADOS) --- */
+        /* --- ESTÉTICA iOS (SEGUN TU CAPTURA) --- */
         :root {
             --ios-bg: #F2F2F7;
-            --ios-card: #FFFFFF;
+            --ios-blue: #007AFF; /* Azul brillante de tu captura */
             --ios-text: #000000;
-            --ios-text-secondary: #8E8E93;
-            --ios-blue: #007AFF; /* Azul Apple */
-            --ios-red: #FF3B30;
-            --ios-green: #34C759;
-            --ios-separator: #C6C6C8;
-            
-            /* TEMA JOSE M. */
-            --brand-color: #007AFF; 
-            --accent-color: #007AFF;
-            
+            --ios-gray: #8E8E93;
             --radius: 14px;
         }
 
@@ -39,7 +30,7 @@
         
         body {
             background-color: var(--ios-bg); margin: 0; padding: 0;
-            color: var(--ios-text); height: 100vh; overflow: hidden;
+            height: 100vh; overflow: hidden;
             padding-top: env(safe-area-inset-top); padding-bottom: env(safe-area-inset-bottom);
         }
 
@@ -49,132 +40,93 @@
             animation: fadeIn 0.3s ease-out;
         }
         .view.active { display: block; }
-        @keyframes fadeIn { from { opacity: 0; transform: scale(0.98); } to { opacity: 1; transform: scale(1); } }
+        @keyframes fadeIn { from { opacity: 0; transform: scale(0.99); } to { opacity: 1; transform: scale(1); } }
 
-        /* --- PANTALLA BIENVENIDA (ESTILO iOS LOCKSCREEN) --- */
+        /* --- 1. PANTALLA BIENVENIDA (TU CAPTURA) --- */
         #view-welcome {
-            background: linear-gradient(135deg, #e0eafc 0%, #cfdef3 100%);
+            background: linear-gradient(135deg, #e6f0ff 0%, #f0f4f8 100%);
             display: flex; flex-direction: column; align-items: center; justify-content: center;
             z-index: 9999;
         }
-        .welcome-avatar {
+        
+        .avatar-circle {
             width: 100px; height: 100px; background: white; border-radius: 50%;
             display: flex; align-items: center; justify-content: center;
-            font-size: 40px; color: var(--ios-blue); box-shadow: 0 15px 35px rgba(0,0,0,0.1);
-            margin-bottom: 25px; animation: float 3s ease-in-out infinite;
+            font-size: 45px; color: var(--ios-blue); 
+            box-shadow: 0 10px 30px rgba(0,122,255,0.15);
+            margin-bottom: 25px;
         }
-        @keyframes float { 0% { transform: translateY(0px); } 50% { transform: translateY(-10px); } 100% { transform: translateY(0px); } }
         
-        .welcome-title { font-size: 28px; font-weight: 700; margin-bottom: 10px; color: #333; }
-        .welcome-sub { font-size: 17px; color: #666; margin-bottom: 40px; }
+        .welcome-title { font-size: 28px; font-weight: 700; color: #111; margin-bottom: 8px; }
+        .welcome-sub { font-size: 17px; color: #666; margin-bottom: 40px; font-weight: 400; }
         
-        .ios-btn-main {
-            background: var(--ios-blue); color: white; border: none; padding: 16px 40px;
-            width: 250px; border-radius: 14px; font-size: 17px; font-weight: 600; cursor: pointer;
-            box-shadow: 0 8px 20px rgba(0,122,255,0.3); transition: transform 0.1s;
+        .btn-enter {
+            background: var(--ios-blue); color: white; border: none;
+            padding: 16px 0; width: 220px; border-radius: 14px;
+            font-size: 17px; font-weight: 600; cursor: pointer;
+            box-shadow: 0 5px 15px rgba(0,122,255,0.3);
+            transition: transform 0.1s;
         }
-        .ios-btn-main:active { transform: scale(0.96); }
+        .btn-enter:active { transform: scale(0.96); }
 
-        /* --- SELECTOR DE CUENTAS (Estilo Ajustes iOS) --- */
-        .ios-header {
-            padding: 20px 20px 10px 20px; background: var(--ios-bg);
-            position: sticky; top: 0; z-index: 100;
-        }
+        /* --- 2. SELECTOR --- */
+        .ios-header { padding: 20px 20px 10px 20px; background: var(--ios-bg); }
         .header-title { font-size: 34px; font-weight: 800; margin: 0; letter-spacing: -0.5px; }
         
-        .account-group {
-            margin: 20px; background: white; border-radius: var(--radius); overflow: hidden;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.03);
-        }
+        .account-group { margin: 20px; background: white; border-radius: 12px; overflow: hidden; }
         .account-row {
             padding: 18px; display: flex; align-items: center;
-            border-bottom: 1px solid var(--ios-separator); cursor: pointer;
-            transition: background 0.2s;
+            border-bottom: 1px solid #E5E5EA; cursor: pointer;
         }
         .account-row:last-child { border-bottom: none; }
         .account-row:active { background: #E5E5EA; }
         
-        .ac-icon-box {
-            width: 32px; height: 32px; border-radius: 7px; display: flex; align-items: center; justify-content: center;
+        .ac-icon {
+            width: 32px; height: 32px; border-radius: 8px; display: flex; align-items: center; justify-content: center;
             color: white; margin-right: 15px; font-size: 14px;
         }
 
-        /* --- DASHBOARD --- */
-        .header-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
-        .back-btn { color: var(--ios-blue); font-size: 17px; background: none; border: none; padding: 0; display: flex; align-items: center; gap: 5px; cursor: pointer;}
-        .balance-label { font-size: 13px; color: var(--ios-text-secondary); text-transform: uppercase; font-weight: 600; margin-top: 15px; letter-spacing: 0.5px; }
-        .balance-amount { font-size: 36px; font-weight: 700; color: #000; cursor: pointer; letter-spacing: -1px; }
+        /* --- 3. DASHBOARD --- */
+        .header-top { display: flex; justify-content: space-between; align-items: center; padding: 20px 20px 0 20px; }
+        .back-btn { color: var(--ios-blue); font-size: 17px; background: none; border: none; display: flex; align-items: center; gap: 5px; font-weight:500; cursor: pointer; }
+        
+        .balance-card { padding: 0 20px 20px 20px; }
+        .balance-label { font-size: 13px; color: #8E8E93; text-transform: uppercase; font-weight: 600; margin-top: 15px; }
+        .balance-amount { font-size: 38px; font-weight: 700; color: #000; cursor: pointer; }
 
-        /* PESTAÑAS (SEGMENTED CONTROL) */
-        .ios-segment {
-            background: #E5E5EA; border-radius: 9px; padding: 2px; display: flex; margin: 15px 20px;
-        }
-        .segment-btn {
-            flex: 1; border: none; background: transparent; padding: 6px;
-            border-radius: 7px; font-size: 13px; font-weight: 600; transition: all 0.2s; cursor: pointer;
-        }
+        .ios-segment { background: #E5E5EA; border-radius: 9px; padding: 2px; display: flex; margin: 0 20px 20px 20px; }
+        .segment-btn { flex: 1; border: none; background: transparent; padding: 6px; border-radius: 7px; font-size: 13px; font-weight: 600; cursor:pointer;}
         .segment-btn.active { background: white; box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
 
-        /* LISTA MOVIMIENTOS */
-        .ios-list { margin: 0 20px 100px 20px; background: white; border-radius: var(--radius); overflow: hidden; box-shadow: 0 2px 10px rgba(0,0,0,0.03); }
-        .list-item {
-            display: flex; align-items: center; justify-content: space-between;
-            padding: 14px 16px; border-bottom: 1px solid var(--ios-separator); cursor: pointer;
-        }
-        .list-item:active { background: #F2F2F7; }
-        .list-item:last-child { border-bottom: none; }
+        .list-container { margin: 0 20px 100px 20px; background: white; border-radius: 12px; overflow: hidden; min-height: 200px; }
+        .list-item { display: flex; justify-content: space-between; align-items: center; padding: 14px 16px; border-bottom: 1px solid #E5E5EA; cursor:pointer;}
         
-        .cat-icon {
-            width: 40px; height: 40px; border-radius: 10px; background: #F2F2F7;
-            display: flex; align-items: center; justify-content: center; color: #333; font-size: 18px; margin-right: 15px;
-        }
-        
-        .t-red { color: #000; } 
-        .t-green { color: var(--ios-green); }
+        .fab { position: fixed; bottom: 40px; right: 20px; width: 56px; height: 56px; border-radius: 50%; background: var(--ios-blue); color: white; border: none; box-shadow: 0 4px 15px rgba(0,122,255,0.4); font-size: 24px; display:flex; align-items:center; justify-content:center; z-index: 200; cursor:pointer;}
 
-        /* FAB */
-        .fab {
-            position: fixed; bottom: 40px; right: 20px; width: 58px; height: 58px; border-radius: 50%;
-            background: var(--ios-blue); color: white; border: none; box-shadow: 0 4px 20px rgba(0,122,255,0.4);
-            font-size: 26px; display: flex; align-items: center; justify-content: center; z-index: 200; cursor: pointer;
-            transition: transform 0.1s;
-        }
-        .fab:active { transform: scale(0.9); }
-
-        /* MODAL SHEET */
+        /* MODAL */
         .sheet-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.4); z-index: 1000; backdrop-filter: blur(2px); }
-        .sheet-content {
-            position: fixed; bottom: 0; left: 0; width: 100%; background: #F2F2F7;
-            border-top-left-radius: 20px; border-top-right-radius: 20px; padding: 20px; padding-bottom: 50px;
-            transform: translateY(100%); transition: transform 0.3s cubic-bezier(0.2, 0.8, 0.2, 1);
-        }
+        .sheet-content { position: fixed; bottom: 0; width: 100%; background: #F2F2F7; border-top-left-radius: 20px; border-top-right-radius: 20px; padding: 20px; padding-bottom: 50px; transform: translateY(100%); transition: transform 0.3s; }
         .sheet-open .sheet-content { transform: translateY(0); }
-        .sheet-handle { width: 40px; height: 5px; background: #C5C5C7; border-radius: 3px; margin: 0 auto 20px auto; }
-
-        /* FORMULARIO */
-        .input-group-ios { background: white; border-radius: 12px; overflow: hidden; margin-bottom: 25px; }
+        
+        .input-group { background: white; border-radius: 12px; overflow: hidden; margin-bottom: 25px; }
         .input-row { display: flex; align-items: center; padding: 0 16px; border-bottom: 1px solid #E5E5EA; height: 55px; }
-        .input-row:last-child { border-bottom: none; }
         .input-row label { width: 100px; font-size: 16px; font-weight: 500; }
         .input-row input, .input-row select { flex: 1; border: none; font-size: 17px; background: transparent; outline: none; text-align: right; color: var(--ios-blue); }
         
-        #charts-container { padding: 20px; background: white; border-radius: 12px; margin: 0 20px; display: none; box-shadow: 0 2px 10px rgba(0,0,0,0.03); }
-        .empty-state { text-align: center; color: #8E8E93; margin-top: 40px; padding-bottom: 40px; }
-        
-        .loader { width: 24px; height: 24px; border: 3px solid #ccc; border-top-color: var(--ios-blue); border-radius: 50%; animation: spin 1s linear infinite; margin: 0 auto; }
-        @keyframes spin { 100% { transform: rotate(360deg); } }
+        #charts-container { display:none; padding: 20px; background: white; margin: 0 20px; border-radius: 12px; }
+        .t-red { color: #000; } .t-green { color: #34C759; }
     </style>
 </head>
 <body>
 
     <div id="view-welcome" class="view active" style="display: flex;">
-        <div class="welcome-avatar">
+        <div class="avatar-circle">
             <i class="fas fa-user"></i>
         </div>
         <div class="welcome-title">Hola, Jose M.</div>
         <div class="welcome-sub">¿Qué quieres hacer hoy?</div>
         
-        <button class="ios-btn-main" onclick="app.enterApp()">
+        <button class="btn-enter" onclick="window.app.enter()">
             Entrar
         </button>
     </div>
@@ -185,16 +137,16 @@
         </div>
         
         <div class="account-group">
-            <div class="account-row" onclick="app.selectAccount('personal')">
-                <div class="ac-icon-box" style="background: var(--ios-blue);"><i class="fas fa-wallet"></i></div>
+            <div class="account-row" onclick="window.app.selectAccount('personal')">
+                <div class="ac-icon" style="background: var(--ios-blue);"><i class="fas fa-wallet"></i></div>
                 <div style="flex:1;">
                     <div style="font-weight: 600; font-size: 17px;">Personal</div>
                     <div style="font-size: 14px; color: #8E8E93;">Mis gastos privados</div>
                 </div>
                 <i class="fas fa-chevron-right" style="color: #C7C7CC;"></i>
             </div>
-            <div class="account-row" onclick="app.selectAccount('comun')">
-                <div class="ac-icon-box" style="background: #5856D6;"><i class="fas fa-users"></i></div>
+            <div class="account-row" onclick="window.app.selectAccount('comun')">
+                <div class="ac-icon" style="background: #5856D6;"><i class="fas fa-users"></i></div>
                 <div style="flex:1;">
                     <div style="font-weight: 600; font-size: 17px;">Común</div>
                     <div style="font-size: 14px; color: #8E8E93;">Compartido</div>
@@ -205,52 +157,48 @@
     </div>
 
     <div id="view-dashboard" class="view">
-        <div class="ios-header">
-            <div class="header-top">
-                <button class="back-btn" onclick="app.goBack()"><i class="fas fa-chevron-left"></i> Cuentas</button>
-                <i class="fas fa-bell" style="color: var(--ios-blue); font-size: 20px; opacity:0.5;"></i>
-            </div>
-            
-            <div class="balance-label">Balance Total</div>
-            <div class="balance-amount" id="total-balance" onclick="app.editInitialBalance()">...</div>
+        <div class="header-top">
+            <button class="back-btn" onclick="window.app.goBack()"><i class="fas fa-chevron-left"></i> Cuentas</button>
+            <i class="fas fa-bell" style="color: var(--ios-blue); font-size: 20px;"></i>
+        </div>
+        
+        <div class="balance-card">
+            <div class="balance-label">BALANCE TOTAL</div>
+            <div class="balance-amount" id="total-balance" onclick="window.app.editBalance()">...</div>
         </div>
 
         <div class="ios-segment">
-            <button id="seg-list" class="segment-btn active" onclick="app.toggleView('list')">Movimientos</button>
-            <button id="seg-chart" class="segment-btn" onclick="app.toggleView('chart')">Análisis</button>
+            <button id="seg-list" class="segment-btn active" onclick="window.app.toggleView('list')">Movimientos</button>
+            <button id="seg-chart" class="segment-btn" onclick="window.app.toggleView('chart')">Análisis</button>
         </div>
 
-        <div id="container-list" class="ios-list">
-            <div class="empty-state">
-                <div class="loader"></div>
-                <div style="margin-top:10px; font-size:14px;">Cargando...</div>
-            </div>
+        <div id="container-list" class="list-container">
+            <div style="padding: 20px; text-align: center; color: #999;">Cargando...</div>
         </div>
         
-        <div id="container-chart" style="display: none;">
-            <div id="charts-container">
-                <canvas id="expensesChart"></canvas>
-            </div>
+        <div id="charts-container">
+            <canvas id="expensesChart"></canvas>
         </div>
 
-        <button class="fab" onclick="app.openModal()"><i class="fas fa-plus"></i></button>
+        <button class="fab" onclick="window.app.openModal()"><i class="fas fa-plus"></i></button>
     </div>
 
-    <div id="modal-sheet" class="sheet-overlay" onclick="app.closeModal(event)">
+    <div id="modal-sheet" class="sheet-overlay" onclick="window.app.closeModal(event)">
         <div class="sheet-content">
             <div class="sheet-handle"></div>
-            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 20px;">
+            <div style="display:flex; justify-content:space-between; margin-bottom: 20px;">
                 <h3 style="margin:0; font-size:18px;">Nuevo Movimiento</h3>
-                <button onclick="app.forceCloseModal()" style="border:none; background:none; color:var(--ios-blue); font-weight:600; font-size:17px;">Cancelar</button>
+                <button onclick="window.app.forceCloseModal()" style="border:none; background:none; color:var(--ios-blue); font-weight:600; font-size:17px;">Cancelar</button>
             </div>
+            
             <form id="transaction-form">
                 <div class="input-group-ios">
-                    <div class="input-row"><label>Cantidad</label><input type="number" id="inp-amount" placeholder="0.00 €" step="0.01" inputmode="decimal" required style="font-size: 20px; font-weight: 600;"></div>
-                    <div class="input-row"><label>Categoría</label><select id="inp-category" required onchange="app.checkSub(this)"><option value="" disabled selected>Seleccionar</option></select></div>
+                    <div class="input-row"><label>Cantidad</label><input type="number" id="inp-amount" placeholder="0.00 €" step="0.01" required style="font-size: 20px; font-weight: 600;"></div>
+                    <div class="input-row"><label>Categoría</label><select id="inp-category" required onchange="window.app.checkSub(this)"><option value="" disabled selected>Seleccionar</option></select></div>
                     <div class="input-row"><label>Fecha</label><input type="date" id="inp-date" required></div>
                     <div class="input-row"><label>Nota</label><input type="text" id="inp-concept" placeholder="Opcional"></div>
                 </div>
-                <button type="submit" class="ios-btn-main" style="width:100%;">Guardar</button>
+                <button type="submit" class="btn-enter" style="width:100%; border-radius:12px;">Guardar</button>
             </form>
         </div>
     </div>
@@ -266,134 +214,121 @@
             appId: "1:845819455154:web:72fcc69e42209dcd970bab"
         };
 
-        firebase.initializeApp(firebaseConfig);
-        const db = firebase.firestore();
+        // INICIALIZAR (A prueba de fallos)
+        try {
+            firebase.initializeApp(firebaseConfig);
+            var db = firebase.firestore();
+        } catch(e) {
+            console.error("Error Firebase:", e);
+            alert("Error conectando a la base de datos. Revisa tu conexión.");
+        }
+
         let myChart = null;
 
-        const app = {
+        // APP GLOBAL
+        window.app = {
             state: {
-                // USUARIO FIJO - SIN LOGIN
-                user: { uid: 'jose_demo_id', name: 'Jose M.' },
-                currentAccount: 'personal', 
-                unsubscribe: null,
-                initialBalance: 0,
-                transactions: []
+                userID: 'usuario_unico_jose', // ID FIJO PARA QUE NO PIDA LOGIN
+                account: 'personal',
+                unsub: null,
+                balance: 0,
+                txs: []
             },
 
-            // ENTRAR DIRECTO
-            enterApp: () => {
-                app.changeView('view-selector');
+            // 1. ENTRAR (Sin lógica compleja, solo visual)
+            enter: () => {
+                document.getElementById('view-welcome').classList.remove('active');
+                document.getElementById('view-selector').classList.add('active');
             },
 
-            // NAVEGACIÓN
+            // 2. CAMBIO DE VISTA GENÉRICO
             changeView: (id) => {
                 document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
                 document.getElementById(id).classList.add('active');
             },
+
             goBack: () => {
-                if(app.state.unsubscribe) app.state.unsubscribe();
-                app.changeView('view-selector');
+                if(window.app.state.unsub) window.app.state.unsub();
+                window.app.changeView('view-selector');
             },
 
-            // CUENTAS
+            // 3. SELECCIÓN DE CUENTA
             selectAccount: (type) => {
-                app.state.currentAccount = type;
-                const root = document.documentElement;
+                window.app.state.account = type;
                 
-                // Color azul siempre (Estilo iOS unificado)
-                root.style.setProperty('--accent-color', '#007AFF');
+                // Cargar saldo local
+                const key = `bal_${type}`;
+                window.app.state.balance = parseFloat(localStorage.getItem(key)) || 0;
 
-                // Cargar Balance Local
-                const key = `bal_${app.state.user.uid}_${type}`;
-                app.state.initialBalance = parseFloat(localStorage.getItem(key)) || 0;
-
-                app.toggleView('list');
-                app.changeView('view-dashboard');
-                app.listenToData();
+                window.app.toggleView('list');
+                window.app.changeView('view-dashboard');
+                window.app.loadData();
             },
 
-            toggleView: (mode) => {
-                const list = document.getElementById('container-list');
-                const chart = document.getElementById('container-chart');
-                const btnList = document.getElementById('seg-list');
-                const btnChart = document.getElementById('seg-chart');
-
-                if(mode === 'list') {
-                    list.style.display = 'block'; chart.style.display = 'none';
-                    btnList.classList.add('active'); btnChart.classList.remove('active');
-                } else {
-                    list.style.display = 'none'; chart.style.display = 'block';
-                    btnList.classList.remove('active'); btnChart.classList.add('active');
-                    app.renderChart();
-                }
-            },
-
-            // BASE DE DATOS (SIN LOGIN REQUERIDO)
-            listenToData: () => {
+            // 4. CARGAR DATOS (FIRESTORE)
+            loadData: () => {
                 const listEl = document.getElementById('container-list');
-                const totalEl = document.getElementById('total-balance');
-                listEl.innerHTML = '<div class="empty-state"><div class="loader"></div><div style="margin-top:15px">Sincronizando...</div></div>';
+                const balEl = document.getElementById('total-balance');
+                listEl.innerHTML = '<div style="padding:20px; text-align:center; color:#999;">Cargando...</div>';
 
-                let query = db.collection("transactions");
-                
-                // Filtramos por tipo. 
-                // Personal -> Solo lo que tenga el ID fijo de Jose.
-                // Comun -> Todo lo que sea comun.
-                if(app.state.currentAccount === 'personal') {
-                    query = query.where("type", "==", "personal").where("uid", "==", app.state.user.uid);
+                // Query simple
+                let q = db.collection("transactions");
+                if(window.app.state.account === 'personal') {
+                    q = q.where("type", "==", "personal").where("uid", "==", window.app.state.userID);
                 } else {
-                    query = query.where("type", "==", "comun");
+                    q = q.where("type", "==", "comun");
                 }
 
-                app.state.unsubscribe = query.onSnapshot((snapshot) => {
+                window.app.state.unsub = q.onSnapshot((snap) => {
                     listEl.innerHTML = '';
-                    let balance = app.state.initialBalance;
-                    const txs = [];
+                    let total = window.app.state.balance;
+                    let arr = [];
 
-                    if(snapshot.empty) {
-                        listEl.innerHTML = '<div class="empty-state">No hay movimientos aún</div>';
-                        totalEl.innerText = new Intl.NumberFormat('es-ES', {style:'currency', currency:'EUR'}).format(balance);
+                    if(snap.empty) {
+                        listEl.innerHTML = '<div style="padding:40px; text-align:center; color:#999;">No hay movimientos</div>';
+                        balEl.innerText = new Intl.NumberFormat('es-ES', {style:'currency', currency:'EUR'}).format(total);
                         return;
                     }
 
-                    snapshot.forEach(doc => { const d = doc.data(); d.id = doc.id; txs.push(d); });
-                    
-                    txs.sort((a,b) => new Date(b.date) - new Date(a.date));
-                    app.state.transactions = txs;
+                    snap.forEach(doc => { let d = doc.data(); d.id = doc.id; arr.push(d); });
+                    arr.sort((a,b) => new Date(b.date) - new Date(a.date));
+                    window.app.state.txs = arr;
 
-                    txs.forEach(t => {
+                    arr.forEach(t => {
                         const isExpense = ['gasto_revolut','bitcoin','mapfre','cti','gasolina','crossfit','suscripciones','varios','hipoteca','credito_coche','luz','agua','gas','telefonia','comedor','comida','gastos_extra'].includes(t.category);
-                        if(isExpense) balance -= t.amount; else balance += t.amount;
+                        if(isExpense) total -= t.amount; else total += t.amount;
 
-                        const icon = app.icons[t.category] || 'fa-tag';
-                        const colorClass = isExpense ? 't-red' : 't-green';
+                        const icon = window.app.icons[t.category] || 'fa-tag';
                         const sign = isExpense ? '-' : '+';
+                        const colorClass = isExpense ? 't-red' : 't-green';
                         
-                        let catName = t.category;
-                        const accCats = app.categories[app.state.currentAccount];
-                        if(accCats.ingresos[t.category]) catName = accCats.ingresos[t.category];
-                        else if(accCats.gastos[t.category]) catName = accCats.gastos[t.category];
+                        let name = t.category;
+                        // Mapeo simple de nombres
+                        if(window.app.categories.personal.ingresos[t.category]) name = window.app.categories.personal.ingresos[t.category];
+                        if(window.app.categories.personal.gastos[t.category]) name = window.app.categories.personal.gastos[t.category];
+                        if(window.app.categories.comun.ingresos[t.category]) name = window.app.categories.comun.ingresos[t.category];
+                        if(window.app.categories.comun.gastos[t.category]) name = window.app.categories.comun.gastos[t.category];
 
                         const html = `
-                        <div class="list-item" onclick="app.askDelete('${t.id}')">
+                        <div class="list-item" onclick="window.app.del('${t.id}')">
                             <div style="display:flex; align-items:center;">
-                                <div class="cat-icon"><i class="fas ${icon}"></i></div>
+                                <div style="width:36px; height:36px; background:#007AFF; border-radius:8px; display:flex; align-items:center; justify-content:center; color:white; margin-right:12px;"><i class="fas ${icon}"></i></div>
                                 <div>
-                                    <div style="font-weight: 600; font-size:16px;">${catName}</div>
+                                    <div style="font-weight:600;">${name}</div>
                                     <div style="font-size:13px; color:#8E8E93;">${t.concept || t.date}</div>
                                 </div>
                             </div>
-                            <div style="font-weight: 600; font-size:16px;" class="${colorClass}">${sign} ${t.amount} €</div>
+                            <div style="font-weight:600;" class="${colorClass}">${sign} ${t.amount} €</div>
                         </div>`;
                         listEl.insertAdjacentHTML('beforeend', html);
                     });
                     
-                    totalEl.innerText = new Intl.NumberFormat('es-ES', {style:'currency', currency:'EUR'}).format(balance);
-                    if(document.getElementById('container-chart').style.display === 'block') app.renderChart();
+                    balEl.innerText = new Intl.NumberFormat('es-ES', {style:'currency', currency:'EUR'}).format(total);
+                    if(document.getElementById('charts-container').style.display === 'block') window.app.renderChart();
                 });
             },
 
-            saveData: (e) => {
+            save: (e) => {
                 e.preventDefault();
                 const amt = parseFloat(document.getElementById('inp-amount').value);
                 const cat = document.getElementById('inp-category').value;
@@ -401,36 +336,53 @@
                 const date = document.getElementById('inp-date').value;
 
                 db.collection("transactions").add({
-                    uid: app.state.user.uid, // Guardamos siempre con el ID fijo
-                    type: app.state.currentAccount,
-                    amount: amt, category: cat, concept: concept, date: date,
-                    timestamp: Date.now()
-                }).then(() => { app.forceCloseModal(); e.target.reset(); })
-                .catch(err => alert("Error al guardar: " + err.message));
+                    uid: window.app.state.userID,
+                    type: window.app.state.account,
+                    amount: amt, category: cat, concept: concept, date: date, timestamp: Date.now()
+                }).then(() => {
+                    window.app.forceCloseModal();
+                    e.target.reset();
+                }).catch(err => alert("Error: " + err.message));
             },
 
-            askDelete: (id) => { if(confirm("¿Eliminar este movimiento?")) db.collection("transactions").doc(id).delete(); },
+            del: (id) => { if(confirm("¿Borrar?")) db.collection("transactions").doc(id).delete(); },
 
-            editInitialBalance: () => {
-                const val = prompt("Saldo Inicial (Base):", app.state.initialBalance);
+            editBalance: () => {
+                const val = prompt("Saldo Inicial:", window.app.state.balance);
                 if(val && !isNaN(val)) {
-                    const key = `bal_${app.state.user.uid}_${app.state.currentAccount}`;
-                    localStorage.setItem(key, val);
-                    app.state.initialBalance = parseFloat(val);
-                    app.listenToData();
+                    localStorage.setItem(`bal_${window.app.state.account}`, val);
+                    window.app.state.balance = parseFloat(val);
+                    window.app.loadData();
+                }
+            },
+
+            // UI HELPERS
+            toggleView: (mode) => {
+                const list = document.getElementById('container-list');
+                const chart = document.getElementById('charts-container');
+                const b1 = document.getElementById('seg-list');
+                const b2 = document.getElementById('seg-chart');
+
+                if(mode === 'list') {
+                    list.style.display = 'block'; chart.style.display = 'none';
+                    b1.classList.add('active'); b2.classList.remove('active');
+                } else {
+                    list.style.display = 'none'; chart.style.display = 'block';
+                    b1.classList.remove('active'); b2.classList.add('active');
+                    window.app.renderChart();
                 }
             },
 
             renderChart: () => {
                 const ctx = document.getElementById('expensesChart').getContext('2d');
                 const dataMap = {};
-                app.state.transactions.forEach(t => {
+                window.app.state.txs.forEach(t => {
                     const isExpense = ['gasto_revolut','bitcoin','mapfre','cti','gasolina','crossfit','suscripciones','varios','hipoteca','credito_coche','luz','agua','gas','telefonia','comedor','comida','gastos_extra'].includes(t.category);
                     if(isExpense) {
-                        let name = t.category;
-                        const accCats = app.categories[app.state.currentAccount];
-                        if(accCats.gastos[t.category]) name = accCats.gastos[t.category].replace(/[^a-zA-ZñÑ\s]/g,'').trim();
-                        if(!dataMap[name]) dataMap[name] = 0; dataMap[name] += t.amount;
+                        let n = t.category; 
+                        if(window.app.categories.personal.gastos[t.category]) n = window.app.categories.personal.gastos[t.category];
+                        n = n.replace(/[^a-zA-ZñÑ\s]/g,'').trim();
+                        if(!dataMap[n]) dataMap[n]=0; dataMap[n]+=t.amount;
                     }
                 });
 
@@ -446,18 +398,18 @@
             },
 
             openModal: () => {
-                app.populateCats();
+                window.app.populateCats();
                 document.getElementById('modal-sheet').classList.add('sheet-open');
                 document.getElementById('modal-sheet').style.display = 'block';
                 document.getElementById('inp-date').valueAsDate = new Date();
             },
-            closeModal: (e) => { if(e.target.id === 'modal-sheet') app.forceCloseModal(); },
+            closeModal: (e) => { if(e.target.id === 'modal-sheet') window.app.forceCloseModal(); },
             forceCloseModal: () => { document.getElementById('modal-sheet').classList.remove('sheet-open'); setTimeout(() => document.getElementById('modal-sheet').style.display = 'none', 300); },
 
             populateCats: () => {
                 const sel = document.getElementById('inp-category');
                 sel.innerHTML = '<option value="" disabled selected>Seleccionar</option>';
-                const cats = app.categories[app.state.currentAccount];
+                const cats = window.app.categories[window.app.state.account];
                 let g1 = document.createElement('optgroup'); g1.label = "Ingresos";
                 for(const [k,v] of Object.entries(cats.ingresos)) { let o = document.createElement('option'); o.value=k; o.innerText=v; g1.appendChild(o); }
                 sel.appendChild(g1);
@@ -471,22 +423,13 @@
             },
 
             categories: {
-                personal: {
-                    ingresos: { nomina: '💰 Nómina', ingreso_extra: '💵 Ingreso Extra' },
-                    gastos: { aporte_comun: '🏠 Aporte Común', ahorro_revolut: '🐷 Ahorro', gasto_revolut: '💳 Gasto', bitcoin: '₿ Crypto', mapfre: '🛡️ Seguro', cti: '💳 Tarjeta CTI', gasolina: '⛽ Gasolina', crossfit: '🏋️ Crossfit', suscripciones: '📺 Suscripciones', varios: '🛒 Varios' }
-                },
-                comun: {
-                    ingresos: { aporte_jose: '👨🏻 Aporte Jose', aporte_sandra: '👩🏼 Aporte Sandra', aporte_extra: '💵 Extra' },
-                    gastos: { hipoteca: '🏠 Hipoteca', credito_coche: '🚗 Coche', luz: '⚡ Luz', agua: '💧 Agua', gas: '🔥 Gas', telefonia: '📱 Internet', comedor: '🍽️ Comedor', comida: '🛒 Supermercado', suscripciones: '📺 Suscripciones', gastos_extra: '💸 Otros' }
-                }
+                personal: { ingresos: { nomina: '💰 Nómina', ingreso_extra: '💵 Ingreso Extra' }, gastos: { aporte_comun: '🏠 Aporte Común', ahorro_revolut: '🐷 Ahorro', gasto_revolut: '💳 Gasto', bitcoin: '₿ Crypto', mapfre: '🛡️ Seguro', cti: '💳 Tarjeta CTI', gasolina: '⛽ Gasolina', crossfit: '🏋️ Crossfit', suscripciones: '📺 Suscripciones', varios: '🛒 Varios' } },
+                comun: { ingresos: { aporte_jose: '👨🏻 Aporte Jose', aporte_sandra: '👩🏼 Aporte Sandra', aporte_extra: '💵 Extra' }, gastos: { hipoteca: '🏠 Hipoteca', credito_coche: '🚗 Coche', luz: '⚡ Luz', agua: '💧 Agua', gas: '🔥 Gas', telefonia: '📱 Internet', comedor: '🍽️ Comedor', comida: '🛒 Supermercado', suscripciones: '📺 Suscripciones', gastos_extra: '💸 Otros' } }
             },
-            icons: {
-                nomina: 'fa-money-bill-wave', ingreso_extra: 'fa-hand-holding-usd', aporte_comun: 'fa-exchange-alt', ahorro_revolut: 'fa-piggy-bank', gasto_revolut: 'fa-credit-card', bitcoin: 'fa-bitcoin', mapfre: 'fa-shield-alt', cti: 'fa-id-card', gasolina: 'fa-gas-pump', crossfit: 'fa-dumbbell', varios: 'fa-shopping-cart', aporte_jose: 'fa-user-plus', aporte_sandra: 'fa-user-plus', aporte_extra: 'fa-plus-circle', hipoteca: 'fa-home', credito_coche: 'fa-car', luz: 'fa-bolt', agua: 'fa-tint', gas: 'fa-fire', telefonia: 'fa-wifi', comedor: 'fa-utensils', comida: 'fa-shopping-basket', suscripciones: 'fa-tv', gastos_extra: 'fa-receipt'
-            }
+            icons: { nomina: 'fa-money-bill-wave', ingreso_extra: 'fa-hand-holding-usd', aporte_comun: 'fa-exchange-alt', ahorro_revolut: 'fa-piggy-bank', gasto_revolut: 'fa-credit-card', bitcoin: 'fa-bitcoin', mapfre: 'fa-shield-alt', cti: 'fa-id-card', gasolina: 'fa-gas-pump', crossfit: 'fa-dumbbell', varios: 'fa-shopping-cart', aporte_jose: 'fa-user-plus', aporte_sandra: 'fa-user-plus', aporte_extra: 'fa-plus-circle', hipoteca: 'fa-home', credito_coche: 'fa-car', luz: 'fa-bolt', agua: 'fa-tint', gas: 'fa-fire', telefonia: 'fa-wifi', comedor: 'fa-utensils', comida: 'fa-shopping-basket', suscripciones: 'fa-tv', gastos_extra: 'fa-receipt' }
         };
 
-        // INICIALIZAR EVENTOS (Sin esperar Auth)
-        document.getElementById('transaction-form').addEventListener('submit', app.saveData);
+        document.getElementById('transaction-form').addEventListener('submit', window.app.save);
     </script>
 </body>
 </html>
