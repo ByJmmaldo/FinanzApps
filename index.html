@@ -27,8 +27,14 @@
             --red: #FF3B30;
             --green: #34C759;
             --separator: #C6C6C8;
-            --radius: 12px;
+            --radius: 14px;
             --accent: #007AFF; 
+            
+            /* COLORES BANCOS */
+            --bbva: #004481;
+            --revolut: #191919;
+            --mapfre: #D81E05;
+            --bitcoin: #F7931A;
         }
 
         * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
@@ -49,106 +55,83 @@
         }
         .view.active { display: block; }
 
-        /* HEADER SELECTOR */
-        .ios-header-lg { 
-            background: var(--bg);
-            padding-top: calc(env(safe-area-inset-top) + 30px); 
-            padding-left: 20px; padding-right: 20px; padding-bottom: 15px;
+        /* --- NUEVO: GRID DE ACTIVOS (PERSONAL) --- */
+        .assets-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            padding: 20px;
         }
+
+        .asset-card {
+            background: white;
+            border-radius: 16px;
+            padding: 15px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            height: 110px;
+            cursor: pointer;
+            transition: transform 0.1s;
+            position: relative;
+            overflow: hidden;
+        }
+        .asset-card:active { transform: scale(0.96); }
+
+        .asset-icon { font-size: 24px; margin-bottom: 10px; }
+        .asset-name { font-size: 13px; font-weight: 600; color: var(--subtext); text-transform: uppercase; }
+        .asset-value { font-size: 20px; font-weight: 700; color: #000; }
+        
+        .live-dot {
+            width: 8px; height: 8px; background: var(--green); border-radius: 50%;
+            position: absolute; top: 15px; right: 15px;
+            box-shadow: 0 0 5px var(--green);
+            animation: pulse 2s infinite;
+            display: none;
+        }
+        @keyframes pulse { 0% { opacity: 1; } 50% { opacity: 0.4; } 100% { opacity: 1; } }
+
+        /* --- ESTILOS COMUNES --- */
+        .ios-header-lg { background: var(--bg); padding-top: calc(env(safe-area-inset-top) + 30px); padding-left: 20px; padding-right: 20px; padding-bottom: 15px; }
         .title-lg { font-size: 34px; font-weight: 800; letter-spacing: -0.5px; margin: 0; }
         .subtitle { font-size: 17px; color: var(--subtext); margin-top: 5px; font-weight: 400; }
 
-        /* GRUPOS Y LISTAS */
-        .ios-group {
-            margin: 20px; background: var(--card); border-radius: var(--radius); overflow: hidden;
-            box-shadow: 0 1px 2px rgba(0,0,0,0.05);
-        }
-        .ios-row {
-            padding: 18px; display: flex; align-items: center;
-            border-bottom: 0.5px solid var(--separator); cursor: pointer;
-            transition: background 0.1s;
-        }
+        .ios-group { margin: 20px; background: var(--card); border-radius: var(--radius); overflow: hidden; box-shadow: 0 1px 2px rgba(0,0,0,0.05); }
+        .ios-row { padding: 18px; display: flex; align-items: center; border-bottom: 0.5px solid var(--separator); cursor: pointer; transition: background 0.1s; }
         .ios-row:active { background: #E5E5EA; }
         .ios-row:last-child { border-bottom: none; }
-
-        .row-icon {
-            width: 32px; height: 32px; border-radius: 7px; display: flex; align-items: center; justify-content: center;
-            color: white; font-size: 14px; margin-right: 15px;
-        }
+        .row-icon { width: 32px; height: 32px; border-radius: 7px; display: flex; align-items: center; justify-content: center; color: white; font-size: 14px; margin-right: 15px; }
         .row-text { flex: 1; }
         .row-title { font-size: 17px; font-weight: 600; margin-bottom: 2px; }
         .row-sub { font-size: 14px; color: var(--subtext); }
 
-        /* DASHBOARD */
-        .nav-bar {
-            display: flex; justify-content: space-between; align-items: center;
-            background: rgba(242, 242, 247, 0.9); 
-            position: sticky; top: 0; z-index: 50;
-            padding-top: calc(env(safe-area-inset-top) + 10px);
-            padding-bottom: 10px;
-            padding-left: 20px; padding-right: 20px;
-            backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px);
-            border-bottom: 0.5px solid rgba(0,0,0,0.1);
-        }
-        
-        .btn-action {
-            color: var(--blue); font-size: 17px; font-weight: 500; border: none; background: none;
-            display: flex; align-items: center; gap: 5px; cursor: pointer; padding: 10px 0;
-        }
+        .nav-bar { display: flex; justify-content: space-between; align-items: center; background: rgba(242, 242, 247, 0.9); position: sticky; top: 0; z-index: 50; padding-top: calc(env(safe-area-inset-top) + 10px); padding-bottom: 10px; padding-left: 20px; padding-right: 20px; backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px); border-bottom: 0.5px solid rgba(0,0,0,0.1); }
+        .btn-back { color: var(--blue); font-size: 17px; font-weight: 500; border: none; background: none; display: flex; align-items: center; gap: 5px; cursor: pointer; padding: 10px 0; }
+        .btn-action { color: var(--blue); font-size: 22px; cursor: pointer; border: none; background: none; }
 
-        .balance-container { padding: 20px; text-align: center; }
+        .balance-container { padding: 10px 20px 20px 20px; text-align: center; }
         .lbl-balance { font-size: 13px; color: var(--subtext); font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; }
         .hero-balance { font-size: 42px; font-weight: 700; margin-top: 5px; letter-spacing: -1px; cursor: pointer; }
 
-        .segment {
-            background: #E5E5EA; border-radius: 9px; padding: 2px;
-            display: flex; margin: 0 20px 20px 20px;
-        }
-        .seg-btn {
-            flex: 1; padding: 7px; border: none; background: none;
-            font-size: 13px; font-weight: 600; border-radius: 7px; cursor: pointer;
-        }
+        .segment { background: #E5E5EA; border-radius: 9px; padding: 2px; display: flex; margin: 0 20px 20px 20px; }
+        .seg-btn { flex: 1; padding: 7px; border: none; background: none; font-size: 13px; font-weight: 600; border-radius: 7px; cursor: pointer; }
         .seg-btn.active { background: white; box-shadow: 0 1px 3px rgba(0,0,0,0.12); }
 
         .tx-list { margin: 0 20px; background: white; border-radius: var(--radius); overflow: hidden; min-height: 100px; }
-        .tx-row {
-            display: flex; justify-content: space-between; align-items: center;
-            padding: 14px 16px; border-bottom: 0.5px solid var(--separator); cursor: pointer;
-        }
+        .tx-row { display: flex; justify-content: space-between; align-items: center; padding: 14px 16px; border-bottom: 0.5px solid var(--separator); cursor: pointer; }
         .tx-row:active { background: #E5E5EA; }
         .tx-row:last-child { border-bottom: none; }
-        
-        .tx-icon {
-            width: 38px; height: 38px; border-radius: 10px; background: #F2F2F7;
-            display: flex; align-items: center; justify-content: center;
-            color: #333; margin-right: 12px; font-size: 16px;
-        }
+        .tx-icon { width: 38px; height: 38px; border-radius: 10px; background: #F2F2F7; display: flex; align-items: center; justify-content: center; color: #333; margin-right: 12px; font-size: 16px; }
         .tx-amount { font-size: 17px; font-weight: 600; }
         .green { color: var(--green); } .red { color: black; }
 
-        .fab {
-            position: fixed; 
-            bottom: calc(env(safe-area-inset-bottom) + 30px);
-            right: 20px;
-            width: 56px; height: 56px; border-radius: 50%;
-            background: var(--accent); color: white;
-            border: none; box-shadow: 0 4px 15px rgba(0,0,0,0.25);
-            font-size: 26px; display: flex; align-items: center; justify-content: center;
-            z-index: 100; transition: transform 0.1s; cursor: pointer;
-        }
+        .fab { position: fixed; bottom: calc(env(safe-area-inset-bottom) + 30px); right: 20px; width: 56px; height: 56px; border-radius: 50%; background: var(--accent); color: white; border: none; box-shadow: 0 4px 15px rgba(0,0,0,0.25); font-size: 26px; display: flex; align-items: center; justify-content: center; z-index: 100; transition: transform 0.1s; cursor: pointer; }
         .fab:active { transform: scale(0.92); }
 
-        /* MODAL */
-        .modal-mask {
-            display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0,0,0,0.4); z-index: 1000; backdrop-filter: blur(3px);
-        }
-        .modal-sheet {
-            position: fixed; bottom: 0; width: 100%; background: #F2F2F7;
-            border-top-left-radius: 20px; border-top-right-radius: 20px;
-            padding: 20px; padding-bottom: 50px;
-            transform: translateY(100%); transition: transform 0.3s cubic-bezier(0.2, 0.8, 0.2, 1);
-        }
+        /* MODALES */
+        .modal-mask { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.4); z-index: 1000; backdrop-filter: blur(3px); }
+        .modal-sheet { position: fixed; bottom: 0; width: 100%; background: #F2F2F7; border-top-left-radius: 20px; border-top-right-radius: 20px; padding: 20px; padding-bottom: 50px; transform: translateY(100%); transition: transform 0.3s cubic-bezier(0.2, 0.8, 0.2, 1); }
         .modal-open .modal-sheet { transform: translateY(0); }
         .sheet-grabber { width: 40px; height: 5px; background: #C5C5C7; border-radius: 3px; margin: 0 auto 20px auto; }
         
@@ -157,16 +140,14 @@
         .form-row:last-child { border-bottom: none; }
         .form-label { width: 90px; font-size: 16px; font-weight: 500; }
         .form-input { flex: 1; border: none; text-align: right; font-size: 17px; outline: none; background: transparent; color: var(--blue); }
+        
         .btn-save { width: 100%; padding: 14px; border-radius: 12px; border: none; background: var(--accent); color: white; font-size: 17px; font-weight: 600; cursor: pointer; }
-
-        /* SETTINGS VIEW */
+        
         .settings-section-title { margin: 20px 20px 5px 20px; font-size: 13px; color: var(--subtext); text-transform: uppercase; }
         .btn-delete-cat { color: var(--red); background: none; border: none; font-size: 16px; cursor: pointer; }
         .btn-add-cat { width: 100%; padding: 12px; color: var(--blue); background: white; border: none; font-size: 16px; font-weight: 500; cursor: pointer; border-radius: 12px; margin-top: 10px; }
-
+        
         #charts-wrapper { display: none; padding: 20px; background: white; margin: 0 20px; border-radius: 12px; }
-        .loader { border: 2px solid #ccc; border-top: 2px solid #666; border-radius: 50%; width: 20px; height: 20px; animation: spin 1s linear infinite; margin: 20px auto; }
-        @keyframes spin { 100% { transform: rotate(360deg); } }
         .empty-state { text-align: center; color: #8E8E93; margin-top: 40px; padding-bottom: 40px; }
     </style>
 </head>
@@ -179,21 +160,15 @@
         </div>
 
         <div class="ios-group">
-            <div class="ios-row" onclick="app.selectAccount('personal')">
+            <div class="ios-row" onclick="app.tryEnterPersonal()">
                 <div class="row-icon" style="background: var(--blue);"><i class="fas fa-user"></i></div>
-                <div class="row-text">
-                    <div class="row-title">Personal</div>
-                    <div class="row-sub">Mis gastos privados</div>
-                </div>
-                <i class="fas fa-chevron-right" style="color: #C7C7CC;"></i>
+                <div class="row-text"><div class="row-title">Personal</div><div class="row-sub">BBVA, Revolut, BTC...</div></div>
+                <i class="fas fa-lock" style="color: #C7C7CC; font-size:14px;"></i>
             </div>
             
             <div class="ios-row" onclick="app.selectAccount('comun')">
                 <div class="row-icon" style="background: #5856D6;"><i class="fas fa-users"></i></div>
-                <div class="row-text">
-                    <div class="row-title">Común</div>
-                    <div class="row-sub">Compartido</div>
-                </div>
+                <div class="row-text"><div class="row-title">Común</div><div class="row-sub">Compartido</div></div>
                 <i class="fas fa-chevron-right" style="color: #C7C7CC;"></i>
             </div>
         </div>
@@ -202,17 +177,33 @@
 
     <div id="view-dashboard" class="view">
         <div class="nav-bar">
-            <button class="btn-action" onclick="app.goBack()">
-                <i class="fas fa-chevron-left"></i> Cuentas
-            </button>
-            <button class="btn-action" onclick="app.openSettings()">
-                <i class="fas fa-cog" style="font-size: 22px;"></i>
-            </button>
+            <button class="btn-back" onclick="app.goBack()"><i class="fas fa-chevron-left"></i> Cuentas</button>
+            <button class="btn-action" onclick="app.openSettings()"><i class="fas fa-cog"></i></button>
+        </div>
+
+        <div id="personal-assets" class="assets-grid" style="display:none;">
+            <div class="asset-card" onclick="app.editAsset('bbva')">
+                <div class="asset-icon" style="color:var(--bbva);"><i class="fas fa-university"></i></div>
+                <div><div class="asset-name">BBVA</div><div class="asset-value" id="val-bbva">0 €</div></div>
+            </div>
+            <div class="asset-card" onclick="app.editAsset('revolut')">
+                <div class="asset-icon" style="color:var(--revolut);"><i class="fas fa-globe"></i></div>
+                <div><div class="asset-name">Revolut</div><div class="asset-value" id="val-revolut">0 €</div></div>
+            </div>
+            <div class="asset-card" onclick="app.editAsset('mapfre')">
+                <div class="asset-icon" style="color:var(--mapfre);"><i class="fas fa-shield-alt"></i></div>
+                <div><div class="asset-name">Mapfre</div><div class="asset-value" id="val-mapfre">0 €</div></div>
+            </div>
+            <div class="asset-card" onclick="app.editAsset('bitcoin')">
+                <div class="live-dot" id="btc-dot"></div>
+                <div class="asset-icon" style="color:var(--bitcoin);"><i class="fab fa-bitcoin"></i></div>
+                <div><div class="asset-name">Bitcoin</div><div class="asset-value" id="val-bitcoin">0 €</div><div style="font-size:11px; color:#999;" id="qty-bitcoin">0 BTC</div></div>
+            </div>
         </div>
 
         <div class="balance-container">
             <div class="lbl-balance">Balance Total</div>
-            <div class="hero-balance" id="total-balance" onclick="app.editBalance()">0,00 €</div>
+            <div class="hero-balance" id="total-balance">0,00 €</div>
         </div>
 
         <div class="segment">
@@ -220,38 +211,43 @@
             <button id="tab-chart" class="seg-btn" onclick="app.toggleTab('chart')">Análisis</button>
         </div>
 
-        <div id="wrapper-list" class="tx-list">
-            <div class="empty-state">
-                <div class="loader"></div>
-                <div style="margin-top:10px; font-size:13px;">Sincronizando...</div>
-            </div>
-        </div>
-
-        <div id="charts-wrapper">
-            <canvas id="chart-canvas"></canvas>
-        </div>
+        <div id="wrapper-list" class="tx-list"><div class="empty-state">Sincronizando...</div></div>
+        <div id="charts-wrapper"><canvas id="chart-canvas"></canvas></div>
 
         <button class="fab" onclick="app.openModal()"><i class="fas fa-plus"></i></button>
     </div>
 
     <div id="view-settings" class="view">
         <div class="nav-bar">
-            <button class="btn-action" onclick="app.closeSettings()">OK</button>
-            <div style="font-weight:600;">Editar Categorías</div>
+            <button class="btn-action" onclick="app.closeSettings()" style="font-size:17px; font-weight:600;">OK</button>
+            <div style="font-weight:600;">Categorías</div>
             <div style="width:40px;"></div>
         </div>
         <div style="padding: 20px;">
             <div class="settings-section-title">Ingresos</div>
             <div class="ios-group" id="list-cats-in"></div>
             <button class="btn-add-cat" onclick="app.addCategory('ingresos')">+ Añadir Ingreso</button>
-
             <div class="settings-section-title" style="margin-top:30px;">Gastos</div>
             <div class="ios-group" id="list-cats-out"></div>
             <button class="btn-add-cat" onclick="app.addCategory('gastos')">+ Añadir Gasto</button>
-            
-            <div style="margin-top:30px; text-align:center; font-size:13px; color:#999;">
-                Tus categorías se guardan en este dispositivo.
+        </div>
+    </div>
+
+    <div id="modal-auth" class="modal-mask" style="z-index: 2000;">
+        <div class="modal-sheet" style="padding-bottom: 40px;">
+            <div class="sheet-grabber"></div>
+            <div style="text-align:center; margin-bottom:20px;">
+                <div style="font-size:40px; margin-bottom:10px;">🔒</div>
+                <h3 style="margin:0;">Seguridad</h3>
+                <p style="color:#8E8E93; font-size:14px; margin-top:5px;">Introduce la clave para acceder</p>
             </div>
+            <div class="form-group">
+                <div class="form-row">
+                    <input type="password" id="inp-pass" class="form-input" placeholder="Contraseña" style="text-align:center; font-weight:bold;">
+                </div>
+            </div>
+            <button class="btn-save" onclick="app.checkPass()">Desbloquear</button>
+            <button onclick="document.getElementById('modal-auth').classList.remove('modal-open'); setTimeout(()=>document.getElementById('modal-auth').style.display='none',300)" style="width:100%; padding:15px; border:none; background:none; color:#8E8E93; margin-top:5px;">Cancelar</button>
         </div>
     </div>
 
@@ -262,25 +258,12 @@
                 <h3 style="margin:0; font-size:19px;">Nuevo</h3>
                 <button onclick="app.forceClose()" style="border:none; background:none; color:var(--blue); font-size:17px; font-weight:500;">Cancelar</button>
             </div>
-
             <form id="form-tx">
                 <div class="form-group">
-                    <div class="form-row">
-                        <label class="form-label">Cantidad</label>
-                        <input type="number" id="inp-amount" class="form-input" placeholder="0.00" step="0.01" required style="font-weight:600; font-size:20px;">
-                    </div>
-                    <div class="form-row">
-                        <label class="form-label">Categoría</label>
-                        <select id="inp-cat" class="form-input" required><option disabled selected>Seleccionar</option></select>
-                    </div>
-                    <div class="form-row">
-                        <label class="form-label">Fecha</label>
-                        <input type="date" id="inp-date" class="form-input" required>
-                    </div>
-                    <div class="form-row">
-                        <label class="form-label">Nota</label>
-                        <input type="text" id="inp-desc" class="form-input" placeholder="Opcional">
-                    </div>
+                    <div class="form-row"><label class="form-label">Cantidad</label><input type="number" id="inp-amount" class="form-input" placeholder="0.00" step="0.01" required style="font-weight:600; font-size:20px;"></div>
+                    <div class="form-row"><label class="form-label">Categoría</label><select id="inp-cat" class="form-input" required><option disabled selected>Seleccionar</option></select></div>
+                    <div class="form-row"><label class="form-label">Fecha</label><input type="date" id="inp-date" class="form-input" required></div>
+                    <div class="form-row"><label class="form-label">Nota</label><input type="text" id="inp-desc" class="form-input" placeholder="Opcional"></div>
                 </div>
                 <button type="submit" class="btn-save">Guardar</button>
             </form>
@@ -303,10 +286,9 @@
             db = firebase.firestore();
         } catch (e) { console.error("Error Firebase", e); }
 
-        // --- CATEGORÍAS BASE (POR DEFECTO) ---
         const defaultCats = {
             personal: {
-                ingresos: { nomina: '💰 Nómina', extra: '💵 Ingreso Extra', bitcoin_val: '₿ Bitcoin (Valor)', mapfre: '🛡️ Plan Pensiones' },
+                ingresos: { nomina: '💰 Nómina', extra: '💵 Ingreso Extra', bitcoin_val: '₿ Bitcoin (Valor/Retorno)', mapfre: '🛡️ Plan Pensiones Mapfre' },
                 gastos: { aporte_comun: '🏠 Aporte Común', ahorro: '🐷 Ahorro', gasto_revolut: '💳 Gasto Revolut', bitcoin_inv: '₿ Bitcoin (Inversión)', gasolina: '⛽ Gasolina', varios: '🛒 Varios' }
             },
             comun: {
@@ -317,203 +299,202 @@
 
         const app = {
             state: {
-                userID: null,
-                account: 'personal',
-                unsub: null,
-                balance: 0,
-                transactions: [],
-                cats: null // Se cargará dinámicamente
+                userID: null, account: 'personal', unsub: null, balanceComun: 0, transactions: [], cats: null,
+                assets: { bbva: 0, revolut: 0, mapfre: 0, btc_qty: 0, btc_price: 0 }
             },
 
             init: () => {
-                // 1. GESTIÓN DE ID (MULTIUSUARIO)
                 let storedID = localStorage.getItem('app_uid');
                 if (!storedID) {
-                    // Generar ID único para nuevos usuarios
                     storedID = 'user_' + Math.random().toString(36).substr(2, 9);
                     localStorage.setItem('app_uid', storedID);
                 }
-                
-                // --- TRUCO PARA TI (JOSE): SI ES TU NAVEGADOR, MANTÉN TU ID VIEJO ---
-                // Si quieres mantener tus datos viejos en tu móvil, descomenta esto una vez y recarga:
-                // localStorage.setItem('app_uid', 'jose_m_id_unico'); 
-                
                 app.state.userID = storedID;
                 document.getElementById('user-id-display').innerText = storedID;
 
-                // 2. CARGAR CATEGORÍAS
                 app.loadCats();
-
-                // 3. LISTENERS
+                app.loadAssets();
+                app.fetchBitcoin();
                 document.getElementById('form-tx').addEventListener('submit', app.save);
+                setInterval(app.fetchBitcoin, 60000);
             },
 
-            // --- GESTIÓN DE CATEGORÍAS ---
-            loadCats: () => {
-                const storedCats = localStorage.getItem('my_categories');
-                if (storedCats) {
-                    app.state.cats = JSON.parse(storedCats);
+            // --- SEGURIDAD LOCAL ---
+            tryEnterPersonal: () => {
+                const m = document.getElementById('modal-auth');
+                m.style.display = 'block';
+                document.getElementById('inp-pass').value = '';
+                document.getElementById('inp-pass').focus();
+                setTimeout(()=>m.classList.add('modal-open'),10);
+            },
+
+            checkPass: () => {
+                const p = document.getElementById('inp-pass').value;
+                if(p === 'jmmaldo2026') {
+                    const m = document.getElementById('modal-auth');
+                    m.classList.remove('modal-open');
+                    setTimeout(()=>m.style.display='none',300);
+                    app.selectAccount('personal');
                 } else {
-                    app.state.cats = JSON.parse(JSON.stringify(defaultCats)); // Copia limpia
+                    alert("Contraseña incorrecta");
+                    document.getElementById('inp-pass').value = '';
                 }
             },
 
+            // --- BITCOIN & ACTIVOS ---
+            fetchBitcoin: async () => {
+                try {
+                    const res = await fetch('https://api.coingecko.com/api/v3/simple/price?ids=bitcoin&vs_currencies=eur');
+                    const data = await res.json();
+                    if(data && data.bitcoin) {
+                        app.state.assets.btc_price = data.bitcoin.eur;
+                        app.updateAssetUI();
+                        document.getElementById('btc-dot').style.display = 'block';
+                    }
+                } catch(e) {}
+            },
+            loadAssets: () => {
+                const saved = localStorage.getItem(`assets_${app.state.userID}`);
+                if(saved) app.state.assets = { ...app.state.assets, ...JSON.parse(saved) };
+            },
+            saveAssets: () => {
+                const toSave = { ...app.state.assets };
+                delete toSave.btc_price;
+                localStorage.setItem(`assets_${app.state.userID}`, JSON.stringify(toSave));
+                app.updateAssetUI();
+            },
+            editAsset: (type) => {
+                let val;
+                if(type === 'bitcoin') {
+                    val = prompt("¿Cuántos BTC tienes? (Ej: 0.005)", app.state.assets.btc_qty);
+                    if(val !== null && !isNaN(val)) { app.state.assets.btc_qty = parseFloat(val); app.saveAssets(); }
+                } else {
+                    val = prompt(`Saldo actual en ${type.toUpperCase()}:`, app.state.assets[type]);
+                    if(val !== null && !isNaN(val)) { app.state.assets[type] = parseFloat(val); app.saveAssets(); }
+                }
+            },
+            updateAssetUI: () => {
+                const a = app.state.assets;
+                const btcVal = a.btc_qty * (a.btc_price || 0);
+                document.getElementById('val-bbva').innerText = app.formatMoney(a.bbva);
+                document.getElementById('val-revolut').innerText = app.formatMoney(a.revolut);
+                document.getElementById('val-mapfre').innerText = app.formatMoney(a.mapfre);
+                document.getElementById('val-bitcoin').innerText = app.formatMoney(btcVal);
+                document.getElementById('qty-bitcoin').innerText = a.btc_qty + " BTC";
+                if(app.state.account === 'personal') {
+                    const total = a.bbva + a.revolut + a.mapfre + btcVal;
+                    document.getElementById('total-balance').innerText = app.formatMoney(total);
+                }
+            },
+
+            // --- CATEGORÍAS ---
+            loadCats: () => {
+                const stored = localStorage.getItem('my_cats_' + app.state.userID);
+                app.state.cats = stored ? JSON.parse(stored) : JSON.parse(JSON.stringify(defaultCats));
+            },
             saveCats: () => {
-                localStorage.setItem('my_categories', JSON.stringify(app.state.cats));
-                app.loadCats(); // Recargar en memoria
-                app.renderSettings(); // Refrescar UI si está abierta
+                localStorage.setItem('my_cats_' + app.state.userID, JSON.stringify(app.state.cats));
+                app.loadCats(); app.renderSettings();
             },
-
-            addCategory: (type) => { // type = 'ingresos' or 'gastos'
-                const name = prompt("Nombre de la nueva categoría (puedes usar emojis):");
-                if (name && name.trim() !== "") {
-                    const key = 'cat_' + Date.now();
-                    app.state.cats[app.state.account][type][key] = name;
-                    app.saveCats();
-                }
+            addCategory: (type) => {
+                const n = prompt("Nombre:");
+                if(n) { app.state.cats[app.state.account][type]['cat_'+Date.now()] = n; app.saveCats(); }
             },
-
-            delCategory: (type, key) => {
-                if(confirm("¿Borrar esta categoría?")) {
-                    delete app.state.cats[app.state.account][type][key];
-                    app.saveCats();
-                }
+            delCategory: (type, k) => {
+                if(confirm("¿Borrar?")) { delete app.state.cats[app.state.account][type][k]; app.saveCats(); }
             },
 
             // --- NAVEGACIÓN ---
             selectAccount: (type) => {
                 app.state.account = type;
                 const root = document.documentElement;
-                if(type === 'personal') root.style.setProperty('--accent', '#007AFF');
-                else root.style.setProperty('--accent', '#5856D6');
-
-                const savedBal = localStorage.getItem(`bal_${type}`);
-                app.state.balance = savedBal ? parseFloat(savedBal) : 0;
+                
+                if(type === 'personal') {
+                    root.style.setProperty('--accent', '#007AFF');
+                    document.getElementById('personal-assets').style.display = 'grid';
+                    app.updateAssetUI();
+                } else {
+                    root.style.setProperty('--accent', '#5856D6');
+                    document.getElementById('personal-assets').style.display = 'none';
+                    const key = `bal_${app.state.userID}_comun`;
+                    app.state.balanceComun = parseFloat(localStorage.getItem(key)) || 0;
+                }
 
                 document.getElementById('view-selector').classList.remove('active');
                 document.getElementById('view-dashboard').classList.add('active');
                 app.toggleTab('list');
                 app.loadData();
             },
-
             goBack: () => {
                 if(app.state.unsub) app.state.unsub();
                 document.getElementById('view-dashboard').classList.remove('active');
                 document.getElementById('view-selector').classList.add('active');
             },
-
-            openSettings: () => {
-                app.renderSettings();
-                document.getElementById('view-settings').classList.add('active');
-            },
-            closeSettings: () => {
-                document.getElementById('view-settings').classList.remove('active');
-            },
+            openSettings: () => { app.renderSettings(); document.getElementById('view-settings').classList.add('active'); },
+            closeSettings: () => { document.getElementById('view-settings').classList.remove('active'); },
 
             renderSettings: () => {
                 const acc = app.state.account;
-                const listIn = document.getElementById('list-cats-in');
-                const listOut = document.getElementById('list-cats-out');
-                listIn.innerHTML = ''; listOut.innerHTML = '';
-
-                // Render Ingresos
-                for (const [key, val] of Object.entries(app.state.cats[acc].ingresos)) {
-                    listIn.innerHTML += `
-                        <div class="ios-row">
-                            <div style="flex:1;">${val}</div>
-                            <button class="btn-delete-cat" onclick="app.delCategory('ingresos', '${key}')"><i class="fas fa-trash"></i></button>
-                        </div>`;
-                }
-                // Render Gastos
-                for (const [key, val] of Object.entries(app.state.cats[acc].gastos)) {
-                    listOut.innerHTML += `
-                        <div class="ios-row">
-                            <div style="flex:1;">${val}</div>
-                            <button class="btn-delete-cat" onclick="app.delCategory('gastos', '${key}')"><i class="fas fa-trash"></i></button>
-                        </div>`;
-                }
+                const mkHtml = (o,t) => Object.entries(o).map(([k,v])=>`<div class="ios-row"><div style="flex:1;">${v}</div><button class="btn-delete-cat" onclick="app.delCategory('${t}','${k}')"><i class="fas fa-trash"></i></button></div>`).join('');
+                document.getElementById('list-cats-in').innerHTML = mkHtml(app.state.cats[acc].ingresos, 'ingresos');
+                document.getElementById('list-cats-out').innerHTML = mkHtml(app.state.cats[acc].gastos, 'gastos');
             },
 
             toggleTab: (mode) => {
-                const list = document.getElementById('wrapper-list');
-                const chart = document.getElementById('charts-wrapper');
-                const b1 = document.getElementById('tab-list');
-                const b2 = document.getElementById('tab-chart');
-
-                if(mode === 'list') {
-                    list.style.display = 'block'; chart.style.display = 'none';
-                    b1.classList.add('active'); b2.classList.remove('active');
-                } else {
-                    list.style.display = 'none'; chart.style.display = 'block';
-                    b1.classList.remove('active'); b2.classList.add('active');
-                    app.renderChart();
-                }
+                document.getElementById('wrapper-list').style.display = mode==='list'?'block':'none';
+                document.getElementById('charts-wrapper').style.display = mode==='chart'?'block':'none';
+                document.getElementById('tab-list').classList.toggle('active', mode==='list');
+                document.getElementById('tab-chart').classList.toggle('active', mode==='chart');
+                if(mode==='chart') app.renderChart();
             },
 
-            // --- DATA ---
-            isExpense: (catKey) => {
-                return !!app.state.cats[app.state.account].gastos[catKey];
-            },
-
-            getName: (catKey) => {
-                const currentCats = app.state.cats[app.state.account];
-                if(currentCats.ingresos[catKey]) return currentCats.ingresos[catKey];
-                if(currentCats.gastos[catKey]) return currentCats.gastos[catKey];
-                return "Desconocido"; // Si se borró la categoría
-            },
-
+            // --- DATOS ---
             loadData: () => {
                 if(!db) return;
                 const listEl = document.getElementById('wrapper-list');
-                const balEl = document.getElementById('total-balance');
-                listEl.innerHTML = '<div class="empty-state"><div class="loader"></div></div>';
+                listEl.innerHTML = '<div class="empty-state">Cargando...</div>';
 
-                let q = db.collection("transactions");
-                if(app.state.account === 'personal') {
-                    q = q.where("type", "==", "personal").where("uid", "==", app.state.userID);
-                } else {
-                    q = q.where("type", "==", "comun"); // Común sigue siendo compartido
-                }
+                let q = db.collection("transactions").where("uid","==",app.state.userID);
+                if(app.state.account==='personal') q = q.where("type","==","personal");
+                else q = q.where("type","==","comun");
 
-                app.state.unsub = q.onSnapshot((snap) => {
+                app.state.unsub = q.onSnapshot(snap => {
                     listEl.innerHTML = '';
-                    let total = app.state.balance;
+                    let totalComun = app.state.balanceComun;
                     let arr = [];
-
+                    
                     if(snap.empty) {
-                        listEl.innerHTML = '<div class="empty-state">No hay movimientos</div>';
-                        balEl.innerText = app.formatMoney(total);
+                        listEl.innerHTML = '<div class="empty-state">Sin movimientos</div>';
+                        if(app.state.account==='comun') document.getElementById('total-balance').innerText = app.formatMoney(totalComun);
                         return;
                     }
 
-                    snap.forEach(doc => { let d = doc.data(); d.id = doc.id; arr.push(d); });
+                    snap.forEach(d => { let x=d.data(); x.id=d.id; arr.push(x); });
                     arr.sort((a,b) => new Date(b.date) - new Date(a.date));
                     app.state.transactions = arr;
 
                     arr.forEach(t => {
-                        const expense = app.isExpense(t.category);
-                        if(expense) total -= t.amount; else total += t.amount;
-
-                        const colorClass = expense ? 'red' : 'green';
-                        const sign = expense ? '-' : '+';
-                        const name = app.getName(t.category);
-
+                        const isExp = !!app.state.cats[app.state.account].gastos[t.category];
+                        if(app.state.account==='comun') { if(isExp) totalComun -= t.amount; else totalComun += t.amount; }
+                        const name = app.state.cats[app.state.account].ingresos[t.category] || app.state.cats[app.state.account].gastos[t.category] || t.category;
                         const html = `
                         <div class="tx-row" onclick="app.askDelete('${t.id}')">
                             <div style="display:flex; align-items:center;">
                                 <div class="tx-icon"><i class="fas fa-tag"></i></div>
-                                <div>
-                                    <div style="font-weight:600; font-size:16px;">${name}</div>
-                                    <div style="font-size:13px; color:#8E8E93;">${t.concept || t.date}</div>
-                                </div>
+                                <div><div style="font-weight:600;">${name}</div><div style="font-size:13px; color:#999;">${t.concept||t.date}</div></div>
                             </div>
-                            <div class="tx-amount ${colorClass}">${sign} ${t.amount} €</div>
+                            <div class="tx-amount ${isExp?'red':'green'}">${isExp?'-':'+'} ${t.amount} €</div>
                         </div>`;
                         listEl.insertAdjacentHTML('beforeend', html);
                     });
-                    
-                    balEl.innerText = app.formatMoney(total);
-                    if(document.getElementById('charts-wrapper').style.display === 'block') app.renderChart();
+
+                    if(app.state.account==='comun') {
+                        document.getElementById('total-balance').innerText = app.formatMoney(totalComun);
+                        document.getElementById('total-balance').onclick = () => app.editBalance();
+                    } else {
+                        document.getElementById('total-balance').onclick = null; 
+                    }
+                    if(document.getElementById('charts-wrapper').style.display==='block') app.renderChart();
                 });
             },
 
@@ -523,81 +504,44 @@
                 const cat = document.getElementById('inp-cat').value;
                 const desc = document.getElementById('inp-desc').value;
                 const date = document.getElementById('inp-date').value;
-
-                db.collection("transactions").add({
-                    uid: app.state.userID,
-                    type: app.state.account,
-                    amount: amt, category: cat, concept: desc, date: date,
-                    timestamp: Date.now()
-                }).then(() => {
-                    app.forceClose();
-                    e.target.reset();
-                }).catch(err => alert("Error: " + err.message));
+                db.collection("transactions").add({ uid: app.state.userID, type: app.state.account, amount: amt, category: cat, concept: desc, date: date, timestamp: Date.now() })
+                .then(() => { app.forceClose(); e.target.reset(); }).catch(err => alert(err.message));
             },
 
-            askDelete: (id) => { if(confirm("¿Eliminar?")) db.collection("transactions").doc(id).delete(); },
-
+            askDelete: (id) => { if(confirm("¿Borrar?")) db.collection("transactions").doc(id).delete(); },
             editBalance: () => {
-                const val = prompt("Saldo Inicial:", app.state.balance);
-                if(val && !isNaN(val)) {
-                    localStorage.setItem(`bal_${app.state.account}`, val);
-                    app.state.balance = parseFloat(val);
-                    app.loadData();
-                }
+                const v = prompt("Saldo Inicial (Común):", app.state.balanceComun);
+                if(v && !isNaN(v)) { localStorage.setItem(`bal_${app.state.userID}_comun`, v); app.state.balanceComun = parseFloat(v); app.loadData(); }
             },
 
             renderChart: () => {
                 const ctx = document.getElementById('chart-canvas').getContext('2d');
                 const dataMap = {};
                 app.state.transactions.forEach(t => {
-                    if(app.isExpense(t.category)) {
-                        let n = app.getName(t.category);
-                        n = n.replace(/[^a-zA-ZñÑáéíóú\s]/g, '').trim();
+                    if(!!app.state.cats[app.state.account].gastos[t.category]) {
+                        let n = (app.state.cats[app.state.account].gastos[t.category] || t.category).replace(/[^a-zA-Z\s]/g,'').trim();
                         if(!dataMap[n]) dataMap[n]=0; dataMap[n]+=t.amount;
                     }
                 });
-
                 if(window.myChart) window.myChart.destroy();
-                window.myChart = new Chart(ctx, {
-                    type: 'bar',
-                    data: {
-                        labels: Object.keys(dataMap),
-                        datasets: [{ label: 'Gastos', data: Object.values(dataMap), backgroundColor: app.state.account==='personal'?'#007AFF':'#5856D6', borderRadius: 6 }]
-                    },
-                    options: { responsive: true, plugins: { legend: {display: false} }, scales: { y: {beginAtZero: true} } }
-                });
+                window.myChart = new Chart(ctx, { type: 'bar', data: { labels: Object.keys(dataMap), datasets: [{ label:'Gastos', data: Object.values(dataMap), backgroundColor: app.state.account==='personal'?'#007AFF':'#5856D6', borderRadius:6 }] }, options: { responsive:true, plugins:{legend:{display:false}}, scales:{y:{beginAtZero:true}} } });
             },
 
             openModal: () => {
-                app.fillCats();
-                const m = document.getElementById('modal');
-                m.style.display = 'block';
+                const s = document.getElementById('inp-cat'); s.innerHTML = '<option disabled selected>Seleccionar</option>';
+                const c = app.state.cats[app.state.account];
+                let g1 = document.createElement('optgroup'); g1.label="INGRESOS";
+                for(const [k,v] of Object.entries(c.ingresos)) { let o=document.createElement('option'); o.value=k; o.text=v; g1.appendChild(o); }
+                s.appendChild(g1);
+                let g2 = document.createElement('optgroup'); g2.label="GASTOS";
+                for(const [k,v] of Object.entries(c.gastos)) { let o=document.createElement('option'); o.value=k; o.text=v; g2.appendChild(o); }
+                s.appendChild(g2);
+                const m = document.getElementById('modal'); m.style.display = 'block';
                 document.getElementById('inp-date').valueAsDate = new Date();
-                setTimeout(() => m.classList.add('modal-open'), 10);
+                setTimeout(()=>m.classList.add('modal-open'),10);
             },
             closeModal: (e) => { if(e.target.id === 'modal') app.forceClose(); },
-            forceClose: () => {
-                const m = document.getElementById('modal');
-                m.classList.remove('modal-open');
-                setTimeout(() => m.style.display = 'none', 300);
-            },
-            fillCats: () => {
-                const s = document.getElementById('inp-cat');
-                s.innerHTML = '<option disabled selected>Seleccionar</option>';
-                const currentCats = app.state.cats[app.state.account];
-                
-                let g1 = document.createElement('optgroup'); g1.label="INGRESOS";
-                for(let [k,v] of Object.entries(currentCats.ingresos)) { 
-                    let o=document.createElement('option'); o.value=k; o.text=v; g1.appendChild(o); 
-                }
-                s.appendChild(g1);
-                
-                let g2 = document.createElement('optgroup'); g2.label="GASTOS";
-                for(let [k,v] of Object.entries(currentCats.gastos)) { 
-                    let o=document.createElement('option'); o.value=k; o.text=v; g2.appendChild(o); 
-                }
-                s.appendChild(g2);
-            },
+            forceClose: () => { const m = document.getElementById('modal'); m.classList.remove('modal-open'); setTimeout(()=>m.style.display='none',300); },
             formatMoney: (n) => new Intl.NumberFormat('es-ES', {style:'currency', currency:'EUR'}).format(n)
         };
 
