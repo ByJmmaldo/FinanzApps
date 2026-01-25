@@ -19,80 +19,44 @@
 
     <style>
         :root {
-            --bg: #F2F2F7;
-            --card: #FFFFFF;
-            --text: #000000;
-            --subtext: #8E8E93;
-            --blue: #007AFF;
-            --red: #FF3B30;
-            --green: #34C759;
-            --separator: #C6C6C8;
-            --radius: 14px;
-            --accent: #007AFF; 
-            
+            --bg: #F2F2F7; --card: #FFFFFF; --text: #000000; --subtext: #8E8E93;
+            --blue: #007AFF; --red: #FF3B30; --green: #34C759; --separator: #C6C6C8;
+            --radius: 14px; --accent: #007AFF; 
             /* COLORES BANCOS */
-            --bbva: #004481;
-            --revolut: #191919;
-            --mapfre: #D81E05;
-            --bitcoin: #F7931A;
+            --bbva: #004481; --revolut: #191919; --mapfre: #D81E05; --bitcoin: #F7931A;
         }
 
         * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
         
         body {
             background-color: var(--bg); margin: 0; padding: 0;
-            height: 100vh; overflow: hidden;
-            color: var(--text);
-            padding-top: env(safe-area-inset-top); 
-            padding-bottom: env(safe-area-inset-bottom);
+            height: 100vh; overflow: hidden; color: var(--text);
+            padding-top: env(safe-area-inset-top); padding-bottom: env(safe-area-inset-bottom);
         }
 
         .view {
             display: none; width: 100%; height: 100%; overflow-y: auto;
             position: absolute; top: 0; left: 0; background: var(--bg);
-            -webkit-overflow-scrolling: touch; 
-            padding-bottom: 120px;
+            -webkit-overflow-scrolling: touch; padding-bottom: 120px;
         }
         .view.active { display: block; }
 
-        /* --- NUEVO: GRID DE ACTIVOS (PERSONAL) --- */
-        .assets-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 15px;
-            padding: 20px;
-        }
-
+        /* ASSETS GRID */
+        .assets-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; padding: 20px; }
         .asset-card {
-            background: white;
-            border-radius: 16px;
-            padding: 15px;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
-            display: flex;
-            flex-direction: column;
-            justify-content: space-between;
-            height: 110px;
-            cursor: pointer;
-            transition: transform 0.1s;
-            position: relative;
-            overflow: hidden;
+            background: white; border-radius: 16px; padding: 15px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.05); display: flex; flex-direction: column;
+            justify-content: space-between; height: 110px; cursor: pointer;
+            transition: transform 0.1s; position: relative; overflow: hidden;
         }
         .asset-card:active { transform: scale(0.96); }
-
         .asset-icon { font-size: 24px; margin-bottom: 10px; }
         .asset-name { font-size: 13px; font-weight: 600; color: var(--subtext); text-transform: uppercase; }
         .asset-value { font-size: 20px; font-weight: 700; color: #000; }
-        
-        .live-dot {
-            width: 8px; height: 8px; background: var(--green); border-radius: 50%;
-            position: absolute; top: 15px; right: 15px;
-            box-shadow: 0 0 5px var(--green);
-            animation: pulse 2s infinite;
-            display: none;
-        }
+        .live-dot { width: 8px; height: 8px; background: var(--green); border-radius: 50%; position: absolute; top: 15px; right: 15px; box-shadow: 0 0 5px var(--green); animation: pulse 2s infinite; display: none; }
         @keyframes pulse { 0% { opacity: 1; } 50% { opacity: 0.4; } 100% { opacity: 1; } }
 
-        /* --- ESTILOS COMUNES --- */
+        /* UI ELEMENTS */
         .ios-header-lg { background: var(--bg); padding-top: calc(env(safe-area-inset-top) + 30px); padding-left: 20px; padding-right: 20px; padding-bottom: 15px; }
         .title-lg { font-size: 34px; font-weight: 800; letter-spacing: -0.5px; margin: 0; }
         .subtitle { font-size: 17px; color: var(--subtext); margin-top: 5px; font-weight: 400; }
@@ -129,20 +93,23 @@
         .fab { position: fixed; bottom: calc(env(safe-area-inset-bottom) + 30px); right: 20px; width: 56px; height: 56px; border-radius: 50%; background: var(--accent); color: white; border: none; box-shadow: 0 4px 15px rgba(0,0,0,0.25); font-size: 26px; display: flex; align-items: center; justify-content: center; z-index: 100; transition: transform 0.1s; cursor: pointer; }
         .fab:active { transform: scale(0.92); }
 
-        /* MODALES */
+        /* MODAL */
         .modal-mask { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.4); z-index: 1000; backdrop-filter: blur(3px); }
         .modal-sheet { position: fixed; bottom: 0; width: 100%; background: #F2F2F7; border-top-left-radius: 20px; border-top-right-radius: 20px; padding: 20px; padding-bottom: 50px; transform: translateY(100%); transition: transform 0.3s cubic-bezier(0.2, 0.8, 0.2, 1); }
         .modal-open .modal-sheet { transform: translateY(0); }
         .sheet-grabber { width: 40px; height: 5px; background: #C5C5C7; border-radius: 3px; margin: 0 auto 20px auto; }
-        
         .form-group { background: white; border-radius: 12px; overflow: hidden; margin-bottom: 25px; }
         .form-row { display: flex; align-items: center; padding: 0 16px; height: 55px; border-bottom: 0.5px solid var(--separator); }
         .form-row:last-child { border-bottom: none; }
         .form-label { width: 90px; font-size: 16px; font-weight: 500; }
         .form-input { flex: 1; border: none; text-align: right; font-size: 17px; outline: none; background: transparent; color: var(--blue); }
-        
         .btn-save { width: 100%; padding: 14px; border-radius: 12px; border: none; background: var(--accent); color: white; font-size: 17px; font-weight: 600; cursor: pointer; }
         
+        /* NUEVO: TABS MODAL */
+        .modal-tabs { display: flex; margin-bottom: 20px; background: #E5E5EA; padding: 2px; border-radius: 9px; }
+        .modal-tab-btn { flex: 1; border: none; background: transparent; padding: 8px; font-size: 14px; font-weight: 600; border-radius: 7px; color: #8E8E93; cursor: pointer; }
+        .modal-tab-btn.active { background: white; color: #000; box-shadow: 0 1px 3px rgba(0,0,0,0.12); }
+
         .settings-section-title { margin: 20px 20px 5px 20px; font-size: 13px; color: var(--subtext); text-transform: uppercase; }
         .btn-delete-cat { color: var(--red); background: none; border: none; font-size: 16px; cursor: pointer; }
         .btn-add-cat { width: 100%; padding: 12px; color: var(--blue); background: white; border: none; font-size: 16px; font-weight: 500; cursor: pointer; border-radius: 12px; margin-top: 10px; }
@@ -158,14 +125,12 @@
             <h1 class="title-lg">Cuentas</h1>
             <div class="subtitle">Finanzas Personales</div>
         </div>
-
         <div class="ios-group">
             <div class="ios-row" onclick="app.tryEnterPersonal()">
                 <div class="row-icon" style="background: var(--blue);"><i class="fas fa-user"></i></div>
                 <div class="row-text"><div class="row-title">Personal</div><div class="row-sub">BBVA, Revolut, BTC...</div></div>
                 <i class="fas fa-lock" style="color: #C7C7CC; font-size:14px;"></i>
             </div>
-            
             <div class="ios-row" onclick="app.selectAccount('comun')">
                 <div class="row-icon" style="background: #5856D6;"><i class="fas fa-users"></i></div>
                 <div class="row-text"><div class="row-title">Común</div><div class="row-sub">Compartido</div></div>
@@ -242,9 +207,7 @@
                 <p style="color:#8E8E93; font-size:14px; margin-top:5px;">Introduce la clave para acceder</p>
             </div>
             <div class="form-group">
-                <div class="form-row">
-                    <input type="password" id="inp-pass" class="form-input" placeholder="Contraseña" style="text-align:center; font-weight:bold;">
-                </div>
+                <div class="form-row"><input type="password" id="inp-pass" class="form-input" placeholder="Contraseña" style="text-align:center; font-weight:bold;"></div>
             </div>
             <button class="btn-save" onclick="app.checkPass()">Desbloquear</button>
             <button onclick="document.getElementById('modal-auth').classList.remove('modal-open'); setTimeout(()=>document.getElementById('modal-auth').style.display='none',300)" style="width:100%; padding:15px; border:none; background:none; color:#8E8E93; margin-top:5px;">Cancelar</button>
@@ -254,14 +217,26 @@
     <div id="modal" class="modal-mask" onclick="app.closeModal(event)">
         <div class="modal-sheet">
             <div class="sheet-grabber"></div>
-            <div style="display:flex; justify-content:space-between; margin-bottom: 20px;">
-                <h3 style="margin:0; font-size:19px;">Nuevo</h3>
-                <button onclick="app.forceClose()" style="border:none; background:none; color:var(--blue); font-size:17px; font-weight:500;">Cancelar</button>
+            
+            <div class="modal-tabs">
+                <button id="mtab-op" class="modal-tab-btn active" onclick="app.switchModalMode('op')">Operación</button>
+                <button id="mtab-tr" class="modal-tab-btn" onclick="app.switchModalMode('tr')">Traspaso</button>
             </div>
+
             <form id="form-tx">
                 <div class="form-group">
                     <div class="form-row"><label class="form-label">Cantidad</label><input type="number" id="inp-amount" class="form-input" placeholder="0.00" step="0.01" required style="font-weight:600; font-size:20px;"></div>
-                    <div class="form-row"><label class="form-label">Categoría</label><select id="inp-cat" class="form-input" required><option disabled selected>Seleccionar</option></select></div>
+                    
+                    <div id="fields-op">
+                        <div class="form-row"><label class="form-label">Categoría</label><select id="inp-cat" class="form-input"><option disabled selected>Seleccionar</option></select></div>
+                        <div class="form-row" id="row-wallet"><label class="form-label">Cuenta</label><select id="inp-wallet" class="form-input"><option value="none">General / Efectivo</option><option value="bbva">BBVA</option><option value="revolut">Revolut</option><option value="mapfre">Mapfre</option></select></div>
+                    </div>
+
+                    <div id="fields-tr" style="display:none;">
+                        <div class="form-row"><label class="form-label">Desde</label><select id="inp-from" class="form-input"><option value="bbva">BBVA</option><option value="revolut">Revolut</option><option value="mapfre">Mapfre</option></select></div>
+                        <div class="form-row"><label class="form-label">Hacia</label><select id="inp-to" class="form-input"><option value="revolut">Revolut</option><option value="mapfre">Mapfre</option><option value="bbva">BBVA</option></select></div>
+                    </div>
+
                     <div class="form-row"><label class="form-label">Fecha</label><input type="date" id="inp-date" class="form-input" required></div>
                     <div class="form-row"><label class="form-label">Nota</label><input type="text" id="inp-desc" class="form-input" placeholder="Opcional"></div>
                 </div>
@@ -271,229 +246,107 @@
     </div>
 
     <script>
-        const firebaseConfig = {
-            apiKey: "AIzaSyDriSSF-UpUlJS2rHcjZ7N0dAsPFpPYgm4",
-            authDomain: "finanzapps-e2edc.firebaseapp.com",
-            projectId: "finanzapps-e2edc",
-            storageBucket: "finanzapps-e2edc.firebasestorage.app",
-            messagingSenderId: "845819455154",
-            appId: "1:845819455154:web:72fcc69e42209dcd970bab"
-        };
-
-        let db = null;
-        try {
-            firebase.initializeApp(firebaseConfig);
-            db = firebase.firestore();
-        } catch (e) { console.error("Error Firebase", e); }
+        const firebaseConfig = { apiKey: "AIzaSyDriSSF-UpUlJS2rHcjZ7N0dAsPFpPYgm4", authDomain: "finanzapps-e2edc.firebaseapp.com", projectId: "finanzapps-e2edc", storageBucket: "finanzapps-e2edc.firebasestorage.app", messagingSenderId: "845819455154", appId: "1:845819455154:web:72fcc69e42209dcd970bab" };
+        let db = null; try { firebase.initializeApp(firebaseConfig); db = firebase.firestore(); } catch (e) {}
 
         const defaultCats = {
-            personal: {
-                ingresos: { nomina: '💰 Nómina', extra: '💵 Ingreso Extra', bitcoin_val: '₿ Bitcoin (Valor/Retorno)', mapfre: '🛡️ Plan Pensiones Mapfre' },
-                gastos: { aporte_comun: '🏠 Aporte Común', ahorro: '🐷 Ahorro', gasto_revolut: '💳 Gasto Revolut', bitcoin_inv: '₿ Bitcoin (Inversión)', gasolina: '⛽ Gasolina', varios: '🛒 Varios' }
-            },
-            comun: {
-                ingresos: { aporte_jose: '👨🏻 Aporte Jose', aporte_sandra: '👩🏼 Aporte Sandra', extra: '💵 Extra' },
-                gastos: { hipoteca: '🏠 Hipoteca', luz: '⚡ Luz/Agua', comida: '🛒 Supermercado', internet: '📱 Internet', otros: '💸 Otros' }
-            }
+            personal: { ingresos: { nomina: '💰 Nómina', extra: '💵 Ingreso Extra', bitcoin_val: '₿ Bitcoin (Valor)' }, gastos: { aporte_comun: '🏠 Aporte Común', ahorro: '🐷 Ahorro', gasto_revolut: '💳 Gasto Revolut', bitcoin_inv: '₿ Bitcoin (Inversión)', gasolina: '⛽ Gasolina', varios: '🛒 Varios' } },
+            comun: { ingresos: { aporte_jose: '👨🏻 Aporte Jose', aporte_sandra: '👩🏼 Aporte Sandra', extra: '💵 Extra' }, gastos: { hipoteca: '🏠 Hipoteca', luz: '⚡ Luz/Agua', comida: '🛒 Supermercado', internet: '📱 Internet', otros: '💸 Otros' } }
         };
 
         const app = {
-            state: {
-                userID: null, account: 'personal', unsub: null, balanceComun: 0, transactions: [], cats: null,
-                assets: { bbva: 0, revolut: 0, mapfre: 0, btc_qty: 0, btc_price: 0 }
-            },
+            state: { userID: null, account: 'personal', unsub: null, balanceComun: 0, transactions: [], cats: null, assets: { bbva: 0, revolut: 0, mapfre: 0, btc_qty: 0, btc_price: 0 }, modalMode: 'op' },
 
             init: () => {
                 let storedID = localStorage.getItem('app_uid');
-                if (!storedID) {
-                    storedID = 'user_' + Math.random().toString(36).substr(2, 9);
-                    localStorage.setItem('app_uid', storedID);
-                }
+                if (!storedID) { storedID = 'user_' + Math.random().toString(36).substr(2, 9); localStorage.setItem('app_uid', storedID); }
                 app.state.userID = storedID;
                 document.getElementById('user-id-display').innerText = storedID;
-
-                app.loadCats();
-                app.loadAssets();
-                app.fetchBitcoin();
+                app.loadCats(); app.loadAssets(); app.fetchBitcoin();
                 document.getElementById('form-tx').addEventListener('submit', app.save);
                 setInterval(app.fetchBitcoin, 60000);
             },
 
-            // --- SEGURIDAD LOCAL ---
-            tryEnterPersonal: () => {
-                const m = document.getElementById('modal-auth');
-                m.style.display = 'block';
-                document.getElementById('inp-pass').value = '';
-                document.getElementById('inp-pass').focus();
-                setTimeout(()=>m.classList.add('modal-open'),10);
+            // --- UI MODAL ---
+            switchModalMode: (mode) => {
+                app.state.modalMode = mode;
+                document.getElementById('mtab-op').classList.toggle('active', mode==='op');
+                document.getElementById('mtab-tr').classList.toggle('active', mode==='tr');
+                document.getElementById('fields-op').style.display = mode==='op'?'block':'none';
+                document.getElementById('fields-tr').style.display = mode==='tr'?'block':'none';
+                
+                // Validación Required
+                document.getElementById('inp-cat').required = (mode === 'op');
             },
 
-            checkPass: () => {
-                const p = document.getElementById('inp-pass').value;
-                if(p === 'jmmaldo2026') {
-                    const m = document.getElementById('modal-auth');
-                    m.classList.remove('modal-open');
-                    setTimeout(()=>m.style.display='none',300);
-                    app.selectAccount('personal');
-                } else {
-                    alert("Contraseña incorrecta");
-                    document.getElementById('inp-pass').value = '';
-                }
-            },
+            // --- SEGURIDAD ---
+            tryEnterPersonal: () => { const m = document.getElementById('modal-auth'); m.style.display = 'block'; document.getElementById('inp-pass').value = ''; document.getElementById('inp-pass').focus(); setTimeout(()=>m.classList.add('modal-open'),10); },
+            checkPass: () => { if(document.getElementById('inp-pass').value === 'jmmaldo2026') { document.getElementById('modal-auth').classList.remove('modal-open'); setTimeout(()=>document.getElementById('modal-auth').style.display='none',300); app.selectAccount('personal'); } else { alert("Incorrecto"); document.getElementById('inp-pass').value = ''; } },
 
-            // --- BITCOIN & ACTIVOS ---
-            fetchBitcoin: async () => {
-                try {
-                    const res = await fetch('https://api.coingecko.com/api/v3/simple/price?ids=bitcoin&vs_currencies=eur');
-                    const data = await res.json();
-                    if(data && data.bitcoin) {
-                        app.state.assets.btc_price = data.bitcoin.eur;
-                        app.updateAssetUI();
-                        document.getElementById('btc-dot').style.display = 'block';
-                    }
-                } catch(e) {}
-            },
-            loadAssets: () => {
-                const saved = localStorage.getItem(`assets_${app.state.userID}`);
-                if(saved) app.state.assets = { ...app.state.assets, ...JSON.parse(saved) };
-            },
-            saveAssets: () => {
-                const toSave = { ...app.state.assets };
-                delete toSave.btc_price;
-                localStorage.setItem(`assets_${app.state.userID}`, JSON.stringify(toSave));
-                app.updateAssetUI();
-            },
-            editAsset: (type) => {
-                let val;
-                if(type === 'bitcoin') {
-                    val = prompt("¿Cuántos BTC tienes? (Ej: 0.005)", app.state.assets.btc_qty);
-                    if(val !== null && !isNaN(val)) { app.state.assets.btc_qty = parseFloat(val); app.saveAssets(); }
-                } else {
-                    val = prompt(`Saldo actual en ${type.toUpperCase()}:`, app.state.assets[type]);
-                    if(val !== null && !isNaN(val)) { app.state.assets[type] = parseFloat(val); app.saveAssets(); }
-                }
+            // --- ACTIVOS ---
+            fetchBitcoin: async () => { try { const r=await fetch('https://api.coingecko.com/api/v3/simple/price?ids=bitcoin&vs_currencies=eur'); const d=await r.json(); if(d.bitcoin) { app.state.assets.btc_price=d.bitcoin.eur; app.updateAssetUI(); document.getElementById('btc-dot').style.display='block'; } } catch(e){} },
+            loadAssets: () => { const s = localStorage.getItem(`assets_${app.state.userID}`); if(s) app.state.assets = { ...app.state.assets, ...JSON.parse(s) }; },
+            saveAssets: () => { const t = { ...app.state.assets }; delete t.btc_price; localStorage.setItem(`assets_${app.state.userID}`, JSON.stringify(t)); app.updateAssetUI(); },
+            editAsset: (type) => { 
+                let v; 
+                if(type==='bitcoin') { v=prompt("BTC Cantidad:", app.state.assets.btc_qty); if(v && !isNaN(v)) { app.state.assets.btc_qty=parseFloat(v); app.saveAssets(); } } 
+                else { v=prompt("Saldo "+type.toUpperCase()+":", app.state.assets[type]); if(v && !isNaN(v)) { app.state.assets[type]=parseFloat(v); app.saveAssets(); } } 
             },
             updateAssetUI: () => {
-                const a = app.state.assets;
-                const btcVal = a.btc_qty * (a.btc_price || 0);
+                const a = app.state.assets; const btcVal = a.btc_qty * (a.btc_price || 0);
                 document.getElementById('val-bbva').innerText = app.formatMoney(a.bbva);
                 document.getElementById('val-revolut').innerText = app.formatMoney(a.revolut);
                 document.getElementById('val-mapfre').innerText = app.formatMoney(a.mapfre);
                 document.getElementById('val-bitcoin').innerText = app.formatMoney(btcVal);
                 document.getElementById('qty-bitcoin').innerText = a.btc_qty + " BTC";
-                if(app.state.account === 'personal') {
-                    const total = a.bbva + a.revolut + a.mapfre + btcVal;
-                    document.getElementById('total-balance').innerText = app.formatMoney(total);
-                }
+                if(app.state.account === 'personal') document.getElementById('total-balance').innerText = app.formatMoney(a.bbva+a.revolut+a.mapfre+btcVal);
             },
 
-            // --- CATEGORÍAS ---
-            loadCats: () => {
-                const stored = localStorage.getItem('my_cats_' + app.state.userID);
-                app.state.cats = stored ? JSON.parse(stored) : JSON.parse(JSON.stringify(defaultCats));
-            },
-            saveCats: () => {
-                localStorage.setItem('my_cats_' + app.state.userID, JSON.stringify(app.state.cats));
-                app.loadCats(); app.renderSettings();
-            },
-            addCategory: (type) => {
-                const n = prompt("Nombre:");
-                if(n) { app.state.cats[app.state.account][type]['cat_'+Date.now()] = n; app.saveCats(); }
-            },
-            delCategory: (type, k) => {
-                if(confirm("¿Borrar?")) { delete app.state.cats[app.state.account][type][k]; app.saveCats(); }
-            },
+            // --- DATA ---
+            loadCats: () => { const s = localStorage.getItem('my_cats_' + app.state.userID); app.state.cats = s ? JSON.parse(s) : JSON.parse(JSON.stringify(defaultCats)); },
+            saveCats: () => { localStorage.setItem('my_cats_' + app.state.userID, JSON.stringify(app.state.cats)); app.loadCats(); app.renderSettings(); },
+            addCategory: (t) => { const n=prompt("Nombre:"); if(n) { app.state.cats[app.state.account][t]['cat_'+Date.now()]=n; app.saveCats(); } },
+            delCategory: (t,k) => { if(confirm("¿Borrar?")) { delete app.state.cats[app.state.account][t][k]; app.saveCats(); } },
 
-            // --- NAVEGACIÓN ---
             selectAccount: (type) => {
-                app.state.account = type;
-                const root = document.documentElement;
-                
-                if(type === 'personal') {
-                    root.style.setProperty('--accent', '#007AFF');
-                    document.getElementById('personal-assets').style.display = 'grid';
-                    app.updateAssetUI();
-                } else {
-                    root.style.setProperty('--accent', '#5856D6');
-                    document.getElementById('personal-assets').style.display = 'none';
-                    const key = `bal_${app.state.userID}_comun`;
-                    app.state.balanceComun = parseFloat(localStorage.getItem(key)) || 0;
-                }
-
-                document.getElementById('view-selector').classList.remove('active');
-                document.getElementById('view-dashboard').classList.add('active');
-                app.toggleTab('list');
-                app.loadData();
+                app.state.account = type; const root = document.documentElement;
+                if(type === 'personal') { root.style.setProperty('--accent', '#007AFF'); document.getElementById('personal-assets').style.display = 'grid'; document.getElementById('row-wallet').style.display = 'flex'; app.updateAssetUI(); } 
+                else { root.style.setProperty('--accent', '#5856D6'); document.getElementById('personal-assets').style.display = 'none'; document.getElementById('row-wallet').style.display = 'none'; const k = `bal_${app.state.userID}_comun`; app.state.balanceComun = parseFloat(localStorage.getItem(k)) || 0; }
+                document.getElementById('view-selector').classList.remove('active'); document.getElementById('view-dashboard').classList.add('active'); app.toggleTab('list'); app.loadData();
             },
-            goBack: () => {
-                if(app.state.unsub) app.state.unsub();
-                document.getElementById('view-dashboard').classList.remove('active');
-                document.getElementById('view-selector').classList.add('active');
-            },
+            goBack: () => { if(app.state.unsub) app.state.unsub(); document.getElementById('view-dashboard').classList.remove('active'); document.getElementById('view-selector').classList.add('active'); },
             openSettings: () => { app.renderSettings(); document.getElementById('view-settings').classList.add('active'); },
             closeSettings: () => { document.getElementById('view-settings').classList.remove('active'); },
+            renderSettings: () => { const a=app.state.account; const h=(o,t)=>Object.entries(o).map(([k,v])=>`<div class="ios-row"><div style="flex:1;">${v}</div><button class="btn-delete-cat" onclick="app.delCategory('${t}','${k}')"><i class="fas fa-trash"></i></button></div>`).join(''); document.getElementById('list-cats-in').innerHTML=h(app.state.cats[a].ingresos,'ingresos'); document.getElementById('list-cats-out').innerHTML=h(app.state.cats[a].gastos,'gastos'); },
+            toggleTab: (m) => { document.getElementById('wrapper-list').style.display=m==='list'?'block':'none'; document.getElementById('charts-wrapper').style.display=m==='chart'?'block':'none'; document.getElementById('tab-list').classList.toggle('active',m==='list'); document.getElementById('tab-chart').classList.toggle('active',m==='chart'); if(m==='chart') app.renderChart(); },
 
-            renderSettings: () => {
-                const acc = app.state.account;
-                const mkHtml = (o,t) => Object.entries(o).map(([k,v])=>`<div class="ios-row"><div style="flex:1;">${v}</div><button class="btn-delete-cat" onclick="app.delCategory('${t}','${k}')"><i class="fas fa-trash"></i></button></div>`).join('');
-                document.getElementById('list-cats-in').innerHTML = mkHtml(app.state.cats[acc].ingresos, 'ingresos');
-                document.getElementById('list-cats-out').innerHTML = mkHtml(app.state.cats[acc].gastos, 'gastos');
-            },
-
-            toggleTab: (mode) => {
-                document.getElementById('wrapper-list').style.display = mode==='list'?'block':'none';
-                document.getElementById('charts-wrapper').style.display = mode==='chart'?'block':'none';
-                document.getElementById('tab-list').classList.toggle('active', mode==='list');
-                document.getElementById('tab-chart').classList.toggle('active', mode==='chart');
-                if(mode==='chart') app.renderChart();
-            },
-
-            // --- DATOS ---
             loadData: () => {
                 if(!db) return;
-                const listEl = document.getElementById('wrapper-list');
-                listEl.innerHTML = '<div class="empty-state">Cargando...</div>';
-
+                document.getElementById('wrapper-list').innerHTML = '<div class="empty-state">Cargando...</div>';
                 let q = db.collection("transactions").where("uid","==",app.state.userID);
-                if(app.state.account==='personal') q = q.where("type","==","personal");
-                else q = q.where("type","==","comun");
-
+                if(app.state.account==='personal') q=q.where("type","==","personal"); else q=q.where("type","==","comun");
                 app.state.unsub = q.onSnapshot(snap => {
-                    listEl.innerHTML = '';
-                    let totalComun = app.state.balanceComun;
-                    let arr = [];
-                    
-                    if(snap.empty) {
-                        listEl.innerHTML = '<div class="empty-state">Sin movimientos</div>';
-                        if(app.state.account==='comun') document.getElementById('total-balance').innerText = app.formatMoney(totalComun);
-                        return;
-                    }
-
+                    document.getElementById('wrapper-list').innerHTML = '';
+                    let totC = app.state.balanceComun; let arr = [];
+                    if(snap.empty && app.state.account==='comun') document.getElementById('total-balance').innerText = app.formatMoney(totC);
                     snap.forEach(d => { let x=d.data(); x.id=d.id; arr.push(x); });
                     arr.sort((a,b) => new Date(b.date) - new Date(a.date));
                     app.state.transactions = arr;
-
                     arr.forEach(t => {
-                        const isExp = !!app.state.cats[app.state.account].gastos[t.category];
-                        if(app.state.account==='comun') { if(isExp) totalComun -= t.amount; else totalComun += t.amount; }
-                        const name = app.state.cats[app.state.account].ingresos[t.category] || app.state.cats[app.state.account].gastos[t.category] || t.category;
-                        const html = `
-                        <div class="tx-row" onclick="app.askDelete('${t.id}')">
-                            <div style="display:flex; align-items:center;">
-                                <div class="tx-icon"><i class="fas fa-tag"></i></div>
-                                <div><div style="font-weight:600;">${name}</div><div style="font-size:13px; color:#999;">${t.concept||t.date}</div></div>
-                            </div>
-                            <div class="tx-amount ${isExp?'red':'green'}">${isExp?'-':'+'} ${t.amount} €</div>
-                        </div>`;
-                        listEl.insertAdjacentHTML('beforeend', html);
+                        let name, color, icon, sign;
+                        if(t.isTransfer) {
+                            name = `Traspaso: ${t.fromWallet.toUpperCase()} ➝ ${t.toWallet.toUpperCase()}`;
+                            color = 'black'; icon = 'fa-exchange-alt'; sign = '';
+                        } else {
+                            const isExp = !!app.state.cats[app.state.account].gastos[t.category];
+                            if(app.state.account==='comun') { if(isExp) totC -= t.amount; else totC += t.amount; }
+                            name = app.state.cats[app.state.account].ingresos[t.category] || app.state.cats[app.state.account].gastos[t.category] || t.category;
+                            color = isExp?'red':'green'; icon = 'fa-tag'; sign = isExp?'-':'+';
+                        }
+                        const html = `<div class="tx-row" onclick="app.askDelete('${t.id}')"><div style="display:flex; align-items:center;"><div class="tx-icon"><i class="fas ${icon}"></i></div><div><div style="font-weight:600;">${name}</div><div style="font-size:13px; color:#999;">${t.concept||t.date}</div></div></div><div class="tx-amount ${color}">${sign} ${t.amount} €</div></div>`;
+                        document.getElementById('wrapper-list').insertAdjacentHTML('beforeend', html);
                     });
-
-                    if(app.state.account==='comun') {
-                        document.getElementById('total-balance').innerText = app.formatMoney(totalComun);
-                        document.getElementById('total-balance').onclick = () => app.editBalance();
-                    } else {
-                        document.getElementById('total-balance').onclick = null; 
-                    }
+                    if(app.state.account==='comun') { document.getElementById('total-balance').innerText = app.formatMoney(totC); document.getElementById('total-balance').onclick = () => app.editBalance(); } else { document.getElementById('total-balance').onclick = null; }
                     if(document.getElementById('charts-wrapper').style.display==='block') app.renderChart();
                 });
             },
@@ -501,24 +354,53 @@
             save: (e) => {
                 e.preventDefault();
                 const amt = parseFloat(document.getElementById('inp-amount').value);
-                const cat = document.getElementById('inp-cat').value;
                 const desc = document.getElementById('inp-desc').value;
                 const date = document.getElementById('inp-date').value;
-                db.collection("transactions").add({ uid: app.state.userID, type: app.state.account, amount: amt, category: cat, concept: desc, date: date, timestamp: Date.now() })
-                .then(() => { app.forceClose(); e.target.reset(); }).catch(err => alert(err.message));
+                const isTr = (app.state.modalMode === 'tr');
+
+                // Lógica TRASPASO
+                if(isTr) {
+                    const from = document.getElementById('inp-from').value;
+                    const to = document.getElementById('inp-to').value;
+                    if(from === to) return alert("Origen y destino deben ser diferentes");
+                    
+                    // Actualizar Saldos
+                    app.state.assets[from] -= amt;
+                    app.state.assets[to] += amt;
+                    app.saveAssets();
+
+                    db.collection("transactions").add({
+                        uid: app.state.userID, type: app.state.account, amount: amt, 
+                        isTransfer: true, fromWallet: from, toWallet: to, 
+                        concept: desc, date: date, timestamp: Date.now()
+                    }).then(() => { app.forceClose(); e.target.reset(); });
+
+                } else {
+                    // Lógica NORMAL
+                    const cat = document.getElementById('inp-cat').value;
+                    const wallet = document.getElementById('inp-wallet').value;
+                    if(app.state.account === 'personal' && wallet !== 'none') {
+                        const isExp = !!app.state.cats[app.state.account].gastos[cat];
+                        if(app.state.assets[wallet] !== undefined) {
+                            if(isExp) app.state.assets[wallet] -= amt; else app.state.assets[wallet] += amt;
+                            app.saveAssets();
+                        }
+                    }
+                    db.collection("transactions").add({
+                        uid: app.state.userID, type: app.state.account, amount: amt, category: cat,
+                        concept: desc, date: date, timestamp: Date.now()
+                    }).then(() => { app.forceClose(); e.target.reset(); });
+                }
             },
 
             askDelete: (id) => { if(confirm("¿Borrar?")) db.collection("transactions").doc(id).delete(); },
-            editBalance: () => {
-                const v = prompt("Saldo Inicial (Común):", app.state.balanceComun);
-                if(v && !isNaN(v)) { localStorage.setItem(`bal_${app.state.userID}_comun`, v); app.state.balanceComun = parseFloat(v); app.loadData(); }
-            },
-
+            editBalance: () => { const v = prompt("Saldo Inicial (Común):", app.state.balanceComun); if(v&&!isNaN(v)) { localStorage.setItem(`bal_${app.state.userID}_comun`, v); app.state.balanceComun=parseFloat(v); app.loadData(); } },
+            
             renderChart: () => {
                 const ctx = document.getElementById('chart-canvas').getContext('2d');
                 const dataMap = {};
                 app.state.transactions.forEach(t => {
-                    if(!!app.state.cats[app.state.account].gastos[t.category]) {
+                    if(!t.isTransfer && !!app.state.cats[app.state.account].gastos[t.category]) {
                         let n = (app.state.cats[app.state.account].gastos[t.category] || t.category).replace(/[^a-zA-Z\s]/g,'').trim();
                         if(!dataMap[n]) dataMap[n]=0; dataMap[n]+=t.amount;
                     }
@@ -528,14 +410,12 @@
             },
 
             openModal: () => {
+                app.switchModalMode('op'); // Reset a Operación
                 const s = document.getElementById('inp-cat'); s.innerHTML = '<option disabled selected>Seleccionar</option>';
                 const c = app.state.cats[app.state.account];
-                let g1 = document.createElement('optgroup'); g1.label="INGRESOS";
-                for(const [k,v] of Object.entries(c.ingresos)) { let o=document.createElement('option'); o.value=k; o.text=v; g1.appendChild(o); }
-                s.appendChild(g1);
-                let g2 = document.createElement('optgroup'); g2.label="GASTOS";
-                for(const [k,v] of Object.entries(c.gastos)) { let o=document.createElement('option'); o.value=k; o.text=v; g2.appendChild(o); }
-                s.appendChild(g2);
+                let g1 = document.createElement('optgroup'); g1.label="INGRESOS"; for(const [k,v] of Object.entries(c.ingresos)) { let o=document.createElement('option'); o.value=k; o.text=v; g1.appendChild(o); } s.appendChild(g1);
+                let g2 = document.createElement('optgroup'); g2.label="GASTOS"; for(const [k,v] of Object.entries(c.gastos)) { let o=document.createElement('option'); o.value=k; o.text=v; g2.appendChild(o); } s.appendChild(g2);
+                document.getElementById('inp-wallet').value = 'none';
                 const m = document.getElementById('modal'); m.style.display = 'block';
                 document.getElementById('inp-date').valueAsDate = new Date();
                 setTimeout(()=>m.classList.add('modal-open'),10);
@@ -544,7 +424,6 @@
             forceClose: () => { const m = document.getElementById('modal'); m.classList.remove('modal-open'); setTimeout(()=>m.style.display='none',300); },
             formatMoney: (n) => new Intl.NumberFormat('es-ES', {style:'currency', currency:'EUR'}).format(n)
         };
-
         window.onload = app.init;
     </script>
 </body>
