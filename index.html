@@ -114,13 +114,23 @@
         #charts-wrapper { display: none; padding: 20px; background: white; margin: 0 20px; border-radius: 12px; }
         .empty-state { text-align: center; color: #8E8E93; margin-top: 40px; padding-bottom: 40px; }
 
-        /* ESTILOS NUEVOS: LISTA DE GASTOS DESGLOSADA */
+        /* ANALYTICS */
         .breakdown-list { margin-top: 25px; }
         .breakdown-row { display: flex; align-items: center; justify-content: space-between; padding: 12px 0; border-bottom: 1px solid #E5E5EA; font-size: 15px; }
         .breakdown-cat { display: flex; align-items: center; font-weight: 500; }
         .breakdown-dot { width: 10px; height: 10px; border-radius: 50%; margin-right: 10px; }
         .breakdown-pct { color: #8E8E93; margin-left: 8px; font-size: 13px; }
-        .breakdown-amt { font-weight: 600; }
+        .breakdown-right { text-align: right; }
+        .breakdown-amt { font-weight: 600; font-size: 16px; }
+        .breakdown-comp { font-size: 12px; font-weight: 500; margin-top: 2px; }
+        .comp-bad { color: var(--red); } .comp-good { color: var(--green); } .comp-neu { color: #C7C7CC; }
+
+        .month-selector { display: flex; align-items: center; justify-content: center; margin-bottom: 20px; }
+        .month-btn { background: none; border: none; color: var(--blue); font-size: 20px; padding: 10px; cursor: pointer; }
+        .month-label { font-size: 17px; font-weight: 600; min-width: 150px; text-align: center; }
+        .trend-badge { font-size: 13px; padding: 4px 8px; border-radius: 6px; margin-left: 10px; font-weight: 600; display: inline-flex; align-items: center; gap: 4px; vertical-align: middle; }
+        .trend-good { background: rgba(52, 199, 89, 0.15); color: var(--green); }
+        .trend-bad { background: rgba(255, 59, 48, 0.15); color: var(--red); }
     </style>
 </head>
 <body>
@@ -184,7 +194,21 @@
         <div id="wrapper-list" class="tx-list"><div class="empty-state">Sincronizando...</div></div>
         
         <div id="charts-wrapper">
-            <div style="height:250px; position:relative;">
+            <div class="month-selector">
+                <button class="month-btn" onclick="app.changeMonth(-1)"><i class="fas fa-chevron-left"></i></button>
+                <div class="month-label" id="lbl-month">Enero 2026</div>
+                <button class="month-btn" onclick="app.changeMonth(1)"><i class="fas fa-chevron-right"></i></button>
+            </div>
+            
+            <div style="text-align:center; margin-bottom:25px;">
+                <span style="font-size:13px; color:#8E8E93; text-transform:uppercase; font-weight:600;">Gasto Mensual</span>
+                <div style="display:flex; align-items:center; justify-content:center; gap:8px;">
+                    <span style="font-size:32px; font-weight:700;" id="month-total">0,00 €</span>
+                    <span id="trend-badge" class="trend-badge" style="display:none;"></span>
+                </div>
+            </div>
+
+            <div style="height:220px; position:relative;">
                 <canvas id="chart-canvas"></canvas>
             </div>
             <div id="breakdown-container" class="breakdown-list"></div>
@@ -228,26 +252,21 @@
     <div id="modal" class="modal-mask" onclick="app.closeModal(event)">
         <div class="modal-sheet">
             <div class="sheet-grabber"></div>
-            
             <div class="modal-tabs">
                 <button id="mtab-op" class="modal-tab-btn active" onclick="app.switchModalMode('op')">Operación</button>
                 <button id="mtab-tr" class="modal-tab-btn" onclick="app.switchModalMode('tr')">Traspaso</button>
             </div>
-
             <form id="form-tx">
                 <div class="form-group">
                     <div class="form-row"><label class="form-label">Cantidad</label><input type="number" id="inp-amount" class="form-input" placeholder="0.00" step="0.01" required style="font-weight:600; font-size:20px;"></div>
-                    
                     <div id="fields-op">
                         <div class="form-row"><label class="form-label">Categoría</label><select id="inp-cat" class="form-input"><option disabled selected>Seleccionar</option></select></div>
                         <div class="form-row" id="row-wallet"><label class="form-label">Cuenta</label><select id="inp-wallet" class="form-input"><option disabled selected value="">Elegir Cuenta...</option><option value="bbva">BBVA</option><option value="revolut">Revolut</option><option value="mapfre">Mapfre</option></select></div>
                     </div>
-
                     <div id="fields-tr" style="display:none;">
                         <div class="form-row"><label class="form-label">Desde</label><select id="inp-from" class="form-input"><option value="bbva">BBVA</option><option value="revolut">Revolut</option><option value="mapfre">Mapfre</option></select></div>
                         <div class="form-row"><label class="form-label">Hacia</label><select id="inp-to" class="form-input"><option value="revolut">Revolut</option><option value="mapfre">Mapfre</option><option value="bbva">BBVA</option></select></div>
                     </div>
-
                     <div class="form-row"><label class="form-label">Fecha</label><input type="date" id="inp-date" class="form-input" required></div>
                     <div class="form-row"><label class="form-label">Nota</label><input type="text" id="inp-desc" class="form-input" placeholder="Opcional"></div>
                 </div>
@@ -265,12 +284,10 @@
             comun: { ingresos: { aporte_jose: '👨🏻 Aporte Jose', aporte_sandra: '👩🏼 Aporte Sandra', extra: '💵 Extra' }, gastos: { hipoteca: '🏠 Hipoteca', luz: '⚡ Luz/Agua', comida: '🛒 Supermercado', internet: '📱 Internet', otros: '💸 Otros' } }
         };
 
-        const chartColors = [
-            '#007AFF', '#FF3B30', '#34C759', '#FF9500', '#5856D6', '#AF52DE', '#FF2D55', '#5AC8FA', '#4CD964', '#FFCC00'
-        ];
+        const chartColors = ['#007AFF', '#FF3B30', '#34C759', '#FF9500', '#5856D6', '#AF52DE', '#FF2D55', '#5AC8FA', '#4CD964', '#FFCC00'];
 
         const app = {
-            state: { userID: null, account: 'personal', unsub: null, balanceComunBase: 0, transactions: [], cats: null, assets: { bbva: 0, revolut: 0, mapfre: 0, btc_qty: 0, btc_price: 0 }, modalMode: 'op' },
+            state: { userID: null, account: 'personal', unsub: null, balanceComunBase: 0, transactions: [], cats: null, assets: { bbva: 0, revolut: 0, mapfre: 0, btc_qty: 0, btc_price: 0 }, modalMode: 'op', chartDate: new Date() },
 
             init: () => {
                 let storedID = localStorage.getItem('app_uid');
@@ -282,7 +299,11 @@
                 setInterval(app.fetchBitcoin, 60000);
             },
 
-            // --- UI MODAL ---
+            changeMonth: (offset) => {
+                app.state.chartDate.setMonth(app.state.chartDate.getMonth() + offset);
+                app.renderChart();
+            },
+
             switchModalMode: (mode) => {
                 app.state.modalMode = mode;
                 document.getElementById('mtab-op').classList.toggle('active', mode==='op');
@@ -294,30 +315,13 @@
                 document.getElementById('inp-cat').required = (mode === 'op');
             },
 
-            // --- SEGURIDAD ---
             tryEnterPersonal: () => { const m = document.getElementById('modal-auth'); m.style.display = 'block'; document.getElementById('inp-pass').value = ''; document.getElementById('inp-pass').focus(); setTimeout(()=>m.classList.add('modal-open'),10); },
             checkPass: () => { if(document.getElementById('inp-pass').value === 'jmmaldo2026') { document.getElementById('modal-auth').classList.remove('modal-open'); setTimeout(()=>document.getElementById('modal-auth').style.display='none',300); app.selectAccount('personal'); } else { alert("Incorrecto"); document.getElementById('inp-pass').value = ''; } },
 
-            // --- ACTIVOS (PERSONAL Y COMÚN) ---
             fetchBitcoin: async () => { try { const r=await fetch('https://api.coingecko.com/api/v3/simple/price?ids=bitcoin&vs_currencies=eur'); const d=await r.json(); if(d.bitcoin) { app.state.assets.btc_price=d.bitcoin.eur; app.updateAssetUI(); document.getElementById('btc-dot').style.display='block'; } } catch(e){} },
-            loadAssets: () => {
-                const s = localStorage.getItem(`assets_${app.state.userID}`);
-                if(s) app.state.assets = { ...app.state.assets, ...JSON.parse(s) };
-                // Cargar saldo común BASE
-                const c = localStorage.getItem(`bal_base_${app.state.userID}_comun`);
-                if(c) app.state.balanceComunBase = parseFloat(c);
-            },
-            saveAssets: () => {
-                const toSave = { ...app.state.assets }; delete toSave.btc_price;
-                localStorage.setItem(`assets_${app.state.userID}`, JSON.stringify(toSave));
-                app.updateAssetUI();
-            },
-            
-            editAsset: (type) => { 
-                let v; 
-                if(type==='bitcoin') { v=prompt("BTC Cantidad:", app.state.assets.btc_qty); if(v && !isNaN(v)) { app.state.assets.btc_qty=parseFloat(v); app.saveAssets(); } } 
-                else { v=prompt("Saldo "+type.toUpperCase()+":", app.state.assets[type]); if(v && !isNaN(v)) { app.state.assets[type]=parseFloat(v); app.saveAssets(); } } 
-            },
+            loadAssets: () => { const s = localStorage.getItem(`assets_${app.state.userID}`); if(s) app.state.assets = { ...app.state.assets, ...JSON.parse(s) }; const c = localStorage.getItem(`bal_base_${app.state.userID}_comun`); if(c) app.state.balanceComunBase = parseFloat(c); },
+            saveAssets: () => { const t = { ...app.state.assets }; delete t.btc_price; localStorage.setItem(`assets_${app.state.userID}`, JSON.stringify(t)); app.updateAssetUI(); },
+            editAsset: (type) => { let v; if(type==='bitcoin') { v=prompt("BTC Cantidad:", app.state.assets.btc_qty); if(v && !isNaN(v)) { app.state.assets.btc_qty=parseFloat(v); app.saveAssets(); } } else { v=prompt("Saldo "+type.toUpperCase()+":", app.state.assets[type]); if(v && !isNaN(v)) { app.state.assets[type]=parseFloat(v); app.saveAssets(); } } },
             updateAssetUI: () => {
                 const a = app.state.assets; const btcVal = a.btc_qty * (a.btc_price || 0);
                 document.getElementById('val-bbva').innerText = app.formatMoney(a.bbva);
@@ -328,7 +332,6 @@
                 if(app.state.account === 'personal') document.getElementById('total-balance').innerText = app.formatMoney(a.bbva+a.revolut+a.mapfre+btcVal);
             },
 
-            // --- DATA ---
             loadCats: () => { const s = localStorage.getItem('my_cats_' + app.state.userID); app.state.cats = s ? JSON.parse(s) : JSON.parse(JSON.stringify(defaultCats)); },
             saveCats: () => { localStorage.setItem('my_cats_' + app.state.userID, JSON.stringify(app.state.cats)); app.loadCats(); app.renderSettings(); },
             addCategory: (t) => { const n=prompt("Nombre:"); if(n) { app.state.cats[app.state.account][t]['cat_'+Date.now()]=n; app.saveCats(); } },
@@ -345,7 +348,6 @@
                     root.style.setProperty('--accent', '#5856D6'); 
                     document.getElementById('personal-assets').style.display = 'none'; 
                     document.getElementById('row-wallet').style.display = 'none';
-                    // Calcular saldo dinámico
                     app.calcComunBalance();
                 }
                 document.getElementById('view-selector').classList.remove('active'); 
@@ -354,7 +356,6 @@
             },
             
             calcComunBalance: () => {
-                // Saldo = Base + Ingresos - Gastos
                 if(app.state.account !== 'comun') return;
                 let total = app.state.balanceComunBase;
                 app.state.transactions.forEach(t => {
@@ -368,7 +369,7 @@
             openSettings: () => { app.renderSettings(); document.getElementById('view-settings').classList.add('active'); },
             closeSettings: () => { document.getElementById('view-settings').classList.remove('active'); },
             renderSettings: () => { const a=app.state.account; const h=(o,t)=>Object.entries(o).map(([k,v])=>`<div class="ios-row"><div style="flex:1;">${v}</div><button class="btn-delete-cat" onclick="app.delCategory('${t}','${k}')"><i class="fas fa-trash"></i></button></div>`).join(''); document.getElementById('list-cats-in').innerHTML=h(app.state.cats[a].ingresos,'ingresos'); document.getElementById('list-cats-out').innerHTML=h(app.state.cats[a].gastos,'gastos'); },
-            toggleTab: (m) => { document.getElementById('wrapper-list').style.display=m==='list'?'block':'none'; document.getElementById('charts-wrapper').style.display=m==='chart'?'block':'none'; document.getElementById('tab-list').classList.toggle('active',m==='list'); document.getElementById('tab-chart').classList.toggle('active',m==='chart'); if(m==='chart') app.renderChart(); },
+            toggleTab: (m) => { document.getElementById('wrapper-list').style.display=m==='list'?'block':'none'; document.getElementById('charts-wrapper').style.display=m==='chart'?'block':'none'; document.getElementById('tab-list').classList.toggle('active',m==='list'); document.getElementById('tab-chart').classList.toggle('active',m==='chart'); if(m==='chart') { app.state.chartDate = new Date(); app.renderChart(); } },
 
             isExpense: (catKey) => !!app.state.cats[app.state.account].gastos[catKey],
             getName: (catKey) => {
@@ -381,7 +382,6 @@
                 document.getElementById('wrapper-list').innerHTML = '<div class="empty-state">Cargando...</div>';
                 let q = db.collection("transactions").where("uid","==",app.state.userID);
                 if(app.state.account==='personal') q=q.where("type","==","personal"); else q=q.where("type","==","comun");
-                
                 app.state.unsub = q.onSnapshot(snap => {
                     document.getElementById('wrapper-list').innerHTML = '';
                     let arr = [];
@@ -405,13 +405,8 @@
                             document.getElementById('wrapper-list').insertAdjacentHTML('beforeend', html);
                         });
                     }
-
-                    if(app.state.account==='comun') {
-                        app.calcComunBalance(); // Recalcular saldo total dinámicamente
-                        document.getElementById('total-balance').onclick = () => app.editBaseBalance();
-                    } else {
-                        document.getElementById('total-balance').onclick = null;
-                    }
+                    if(app.state.account==='comun') { app.calcComunBalance(); document.getElementById('total-balance').onclick = () => app.editBaseBalance(); } 
+                    else { document.getElementById('total-balance').onclick = null; }
                     if(document.getElementById('charts-wrapper').style.display==='block') app.renderChart();
                 });
             },
@@ -441,55 +436,96 @@
                             app.saveAssets();
                         }
                     } 
-                    // En Común NO tocamos saldo manual, se calcula dinámicamente al leer la lista
                     db.collection("transactions").add({ uid: app.state.userID, type: app.state.account, amount: amt, category: cat, concept: desc, date: date, timestamp: Date.now() })
                     .then(() => { app.forceClose(); e.target.reset(); });
                 }
             },
 
             askDelete: (id) => { if(confirm("¿Borrar?")) db.collection("transactions").doc(id).delete(); },
-            
-            editBaseBalance: () => { 
-                const v = prompt("Saldo BASE (Dinero inicial antes de los movimientos):", app.state.balanceComunBase);
-                if(v && !isNaN(v)) { 
-                    localStorage.setItem(`bal_base_${app.state.userID}_comun`, v); 
-                    app.state.balanceComunBase = parseFloat(v); 
-                    app.calcComunBalance(); 
-                } 
-            },
+            editBaseBalance: () => { const v = prompt("Saldo BASE:", app.state.balanceComunBase); if(v && !isNaN(v)) { localStorage.setItem(`bal_base_${app.state.userID}_comun`, v); app.state.balanceComunBase = parseFloat(v); app.calcComunBalance(); } },
             
             renderChart: () => {
                 const ctx = document.getElementById('chart-canvas').getContext('2d');
-                const dataMap = {};
-                let totalSpent = 0;
+                const dataCurrent = {}, dataPrev = {};
+                let totalCurrent = 0, totalPrev = 0;
+                
+                // FECHAS
+                const curM = app.state.chartDate.getMonth();
+                const curY = app.state.chartDate.getFullYear();
+                
+                const prevD = new Date(app.state.chartDate);
+                prevD.setMonth(curM - 1);
+                const prevM = prevD.getMonth();
+                const prevY = prevD.getFullYear();
 
+                // HEADER MES
+                const monthNames = ["Enero","Febrero","Marzo","Abril","Mayo","Junio","Julio","Agosto","Septiembre","Octubre","Noviembre","Diciembre"];
+                document.getElementById('lbl-month').innerText = `${monthNames[curM]} ${curY}`;
+
+                // PROCESAR DATOS
                 app.state.transactions.forEach(t => {
-                    if(!t.isTransfer && !!app.state.cats[app.state.account].gastos[t.category]) {
-                        let n = app.getName(t.category).replace(/[^a-zA-Z\s]/g,'').trim();
-                        if(!dataMap[n]) dataMap[n]=0; 
-                        dataMap[n]+=t.amount;
-                        totalSpent += t.amount;
+                    if(t.isTransfer || !app.state.cats[app.state.account].gastos[t.category]) return; // Solo gastos
+                    
+                    const tDate = new Date(t.date);
+                    const n = app.getName(t.category).replace(/[^a-zA-Z\s]/g,'').trim();
+
+                    // MES ACTUAL
+                    if(tDate.getMonth()===curM && tDate.getFullYear()===curY) {
+                        if(!dataCurrent[n]) dataCurrent[n]=0; 
+                        dataCurrent[n]+=t.amount; totalCurrent+=t.amount;
+                    }
+                    // MES ANTERIOR
+                    if(tDate.getMonth()===prevM && tDate.getFullYear()===prevY) {
+                        if(!dataPrev[n]) dataPrev[n]=0;
+                        dataPrev[n]+=t.amount; totalPrev+=t.amount;
                     }
                 });
 
-                const labels = Object.keys(dataMap);
-                const data = Object.values(dataMap);
+                // BADGE TOTAL
+                document.getElementById('month-total').innerText = app.formatMoney(totalCurrent);
+                const badge = document.getElementById('trend-badge');
+                if(totalPrev > 0) {
+                    const diff = totalCurrent - totalPrev;
+                    const pct = ((diff / totalPrev) * 100).toFixed(0);
+                    const isGood = diff < 0; 
+                    badge.style.display = 'inline-flex';
+                    badge.className = 'trend-badge ' + (isGood ? 'trend-good' : 'trend-bad');
+                    badge.innerHTML = (isGood ? '⬇' : '⬆') + ' ' + Math.abs(pct) + '%';
+                } else { badge.style.display = 'none'; }
 
-                // Generar lista desglosada
+                // LISTA DESGLOSADA COMPARATIVA
                 const listContainer = document.getElementById('breakdown-container');
                 listContainer.innerHTML = '';
+                const labels = Object.keys(dataCurrent);
+                const values = Object.values(dataCurrent);
+
                 labels.forEach((lbl, index) => {
-                    const amt = data[index];
-                    const pct = totalSpent > 0 ? ((amt/totalSpent)*100).toFixed(1) : 0;
+                    const amt = values[index];
+                    const prevAmt = dataPrev[lbl] || 0;
+                    const diff = amt - prevAmt;
+                    const pct = ((amt/totalCurrent)*100).toFixed(1);
                     const color = chartColors[index % chartColors.length];
                     
+                    let compHTML = '';
+                    if(prevAmt > 0) {
+                        const isGood = diff <= 0; // Gastar menos es bueno
+                        const arrow = isGood ? '⬇' : '⬆';
+                        const css = isGood ? 'comp-good' : 'comp-bad';
+                        compHTML = `<div class="breakdown-comp ${css}">${arrow} ${app.formatMoney(Math.abs(diff))} vs mes ant.</div>`;
+                    } else if (totalPrev > 0) {
+                        compHTML = `<div class="breakdown-comp comp-bad">Nuevo gasto</div>`;
+                    }
+
                     const html = `
                     <div class="breakdown-row">
                         <div class="breakdown-cat">
                             <div class="breakdown-dot" style="background:${color}"></div>
                             ${lbl} <span class="breakdown-pct">${pct}%</span>
                         </div>
-                        <div class="breakdown-amt">${app.formatMoney(amt)}</div>
+                        <div class="breakdown-right">
+                            <div class="breakdown-amt">${app.formatMoney(amt)}</div>
+                            ${compHTML}
+                        </div>
                     </div>`;
                     listContainer.insertAdjacentHTML('beforeend', html);
                 });
@@ -497,20 +533,8 @@
                 if(window.myChart) window.myChart.destroy();
                 window.myChart = new Chart(ctx, { 
                     type: 'doughnut', 
-                    data: { 
-                        labels: labels, 
-                        datasets: [{ 
-                            data: data, 
-                            backgroundColor: chartColors,
-                            borderWidth: 0
-                        }] 
-                    }, 
-                    options: { 
-                        responsive:true, 
-                        maintainAspectRatio: false,
-                        plugins:{ legend:{ display: false } }, 
-                        cutout: '70%'
-                    } 
+                    data: { labels: labels, datasets: [{ data: values, backgroundColor: chartColors, borderWidth: 0 }] }, 
+                    options: { responsive:true, maintainAspectRatio: false, plugins:{ legend:{ display: false } }, cutout: '70%' } 
                 });
             },
 
