@@ -3,17 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="Finanzapps">
-    
     <link rel="apple-touch-icon" href="icon.png">
     <link rel="icon" type="image/png" href="icon.png">
-    
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
 
@@ -22,33 +18,16 @@
             --bg: #F2F2F7; --card: #FFFFFF; --text: #000000; --subtext: #8E8E93;
             --blue: #007AFF; --red: #FF3B30; --green: #34C759; --separator: #C6C6C8;
             --radius: 14px; --accent: #007AFF; 
-            /* COLORES BANCOS */
             --bbva: #004481; --revolut: #191919; --mapfre: #D81E05; --bitcoin: #F7931A;
         }
-
         * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
-        
-        body {
-            background-color: var(--bg); margin: 0; padding: 0;
-            height: 100vh; overflow: hidden; color: var(--text);
-            padding-top: env(safe-area-inset-top); padding-bottom: env(safe-area-inset-bottom);
-        }
-
-        .view {
-            display: none; width: 100%; height: 100%; overflow-y: auto;
-            position: absolute; top: 0; left: 0; background: var(--bg);
-            -webkit-overflow-scrolling: touch; padding-bottom: 120px;
-        }
+        body { background-color: var(--bg); margin: 0; padding: 0; height: 100vh; overflow: hidden; color: var(--text); padding-top: env(safe-area-inset-top); padding-bottom: env(safe-area-inset-bottom); }
+        .view { display: none; width: 100%; height: 100%; overflow-y: auto; position: absolute; top: 0; left: 0; background: var(--bg); -webkit-overflow-scrolling: touch; padding-bottom: 120px; }
         .view.active { display: block; }
 
         /* ASSETS GRID */
         .assets-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; padding: 20px; }
-        .asset-card {
-            background: white; border-radius: 16px; padding: 15px;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.05); display: flex; flex-direction: column;
-            justify-content: space-between; height: 110px; cursor: pointer;
-            transition: transform 0.1s; position: relative; overflow: hidden;
-        }
+        .asset-card { background: white; border-radius: 16px; padding: 15px; box-shadow: 0 4px 12px rgba(0,0,0,0.05); display: flex; flex-direction: column; justify-content: space-between; height: 110px; cursor: pointer; transition: transform 0.1s; position: relative; overflow: hidden; }
         .asset-card:active { transform: scale(0.96); }
         .asset-icon { font-size: 24px; margin-bottom: 10px; }
         .asset-name { font-size: 13px; font-weight: 600; color: var(--subtext); text-transform: uppercase; }
@@ -60,7 +39,6 @@
         .ios-header-lg { background: var(--bg); padding-top: calc(env(safe-area-inset-top) + 30px); padding-left: 20px; padding-right: 20px; padding-bottom: 15px; }
         .title-lg { font-size: 34px; font-weight: 800; letter-spacing: -0.5px; margin: 0; }
         .subtitle { font-size: 17px; color: var(--subtext); margin-top: 5px; font-weight: 400; }
-
         .ios-group { margin: 20px; background: var(--card); border-radius: var(--radius); overflow: hidden; box-shadow: 0 1px 2px rgba(0,0,0,0.05); }
         .ios-row { padding: 18px; display: flex; align-items: center; border-bottom: 0.5px solid var(--separator); cursor: pointer; transition: background 0.1s; }
         .ios-row:active { background: #E5E5EA; }
@@ -69,19 +47,15 @@
         .row-text { flex: 1; }
         .row-title { font-size: 17px; font-weight: 600; margin-bottom: 2px; }
         .row-sub { font-size: 14px; color: var(--subtext); }
-
         .nav-bar { display: flex; justify-content: space-between; align-items: center; background: rgba(242, 242, 247, 0.9); position: sticky; top: 0; z-index: 50; padding-top: calc(env(safe-area-inset-top) + 10px); padding-bottom: 10px; padding-left: 20px; padding-right: 20px; backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px); border-bottom: 0.5px solid rgba(0,0,0,0.1); }
         .btn-back { color: var(--blue); font-size: 17px; font-weight: 500; border: none; background: none; display: flex; align-items: center; gap: 5px; cursor: pointer; padding: 10px 0; }
         .btn-action { color: var(--blue); font-size: 22px; cursor: pointer; border: none; background: none; }
-
         .balance-container { padding: 10px 20px 20px 20px; text-align: center; }
         .lbl-balance { font-size: 13px; color: var(--subtext); font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; }
         .hero-balance { font-size: 42px; font-weight: 700; margin-top: 5px; letter-spacing: -1px; cursor: pointer; }
-
         .segment { background: #E5E5EA; border-radius: 9px; padding: 2px; display: flex; margin: 0 20px 20px 20px; }
         .seg-btn { flex: 1; padding: 7px; border: none; background: none; font-size: 13px; font-weight: 600; border-radius: 7px; cursor: pointer; }
         .seg-btn.active { background: white; box-shadow: 0 1px 3px rgba(0,0,0,0.12); }
-
         .tx-list { margin: 0 20px; background: white; border-radius: var(--radius); overflow: hidden; min-height: 100px; }
         .tx-row { display: flex; justify-content: space-between; align-items: center; padding: 14px 16px; border-bottom: 0.5px solid var(--separator); cursor: pointer; }
         .tx-row:active { background: #E5E5EA; }
@@ -89,11 +63,8 @@
         .tx-icon { width: 38px; height: 38px; border-radius: 10px; background: #F2F2F7; display: flex; align-items: center; justify-content: center; color: #333; margin-right: 12px; font-size: 16px; }
         .tx-amount { font-size: 17px; font-weight: 600; }
         .green { color: var(--green); } .red { color: black; }
-
         .fab { position: fixed; bottom: calc(env(safe-area-inset-bottom) + 30px); right: 20px; width: 56px; height: 56px; border-radius: 50%; background: var(--accent); color: white; border: none; box-shadow: 0 4px 15px rgba(0,0,0,0.25); font-size: 26px; display: flex; align-items: center; justify-content: center; z-index: 100; transition: transform 0.1s; cursor: pointer; }
         .fab:active { transform: scale(0.92); }
-
-        /* MODAL */
         .modal-mask { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.4); z-index: 1000; backdrop-filter: blur(3px); }
         .modal-sheet { position: fixed; bottom: 0; width: 100%; background: #F2F2F7; border-top-left-radius: 20px; border-top-right-radius: 20px; padding: 20px; padding-bottom: 50px; transform: translateY(100%); transition: transform 0.3s cubic-bezier(0.2, 0.8, 0.2, 1); }
         .modal-open .modal-sheet { transform: translateY(0); }
@@ -104,16 +75,12 @@
         .form-label { width: 90px; font-size: 16px; font-weight: 500; }
         .form-input { flex: 1; border: none; text-align: right; font-size: 17px; outline: none; background: transparent; color: var(--blue); }
         .btn-save { width: 100%; padding: 14px; border-radius: 12px; border: none; background: var(--accent); color: white; font-size: 17px; font-weight: 600; cursor: pointer; }
-        
-        /* NUEVO: TABS MODAL */
         .modal-tabs { display: flex; margin-bottom: 20px; background: #E5E5EA; padding: 2px; border-radius: 9px; }
         .modal-tab-btn { flex: 1; border: none; background: transparent; padding: 8px; font-size: 14px; font-weight: 600; border-radius: 7px; color: #8E8E93; cursor: pointer; }
         .modal-tab-btn.active { background: white; color: #000; box-shadow: 0 1px 3px rgba(0,0,0,0.12); }
-
         .settings-section-title { margin: 20px 20px 5px 20px; font-size: 13px; color: var(--subtext); text-transform: uppercase; }
         .btn-delete-cat { color: var(--red); background: none; border: none; font-size: 16px; cursor: pointer; }
         .btn-add-cat { width: 100%; padding: 12px; color: var(--blue); background: white; border: none; font-size: 16px; font-weight: 500; cursor: pointer; border-radius: 12px; margin-top: 10px; }
-        
         #charts-wrapper { display: none; padding: 20px; background: white; margin: 0 20px; border-radius: 12px; }
         .empty-state { text-align: center; color: #8E8E93; margin-top: 40px; padding-bottom: 40px; }
     </style>
@@ -229,7 +196,7 @@
                     
                     <div id="fields-op">
                         <div class="form-row"><label class="form-label">Categoría</label><select id="inp-cat" class="form-input"><option disabled selected>Seleccionar</option></select></div>
-                        <div class="form-row" id="row-wallet"><label class="form-label">Cuenta</label><select id="inp-wallet" class="form-input"><option value="none">General / Efectivo</option><option value="bbva">BBVA</option><option value="revolut">Revolut</option><option value="mapfre">Mapfre</option></select></div>
+                        <div class="form-row" id="row-wallet"><label class="form-label">Cuenta</label><select id="inp-wallet" class="form-input"><option disabled selected value="">Elegir Cuenta...</option><option value="bbva">BBVA</option><option value="revolut">Revolut</option><option value="mapfre">Mapfre</option></select></div>
                     </div>
 
                     <div id="fields-tr" style="display:none;">
@@ -275,7 +242,12 @@
                 document.getElementById('fields-op').style.display = mode==='op'?'block':'none';
                 document.getElementById('fields-tr').style.display = mode==='tr'?'block':'none';
                 
-                // Validación Required
+                // Validación para Personal
+                if(app.state.account === 'personal' && mode === 'op') {
+                    document.getElementById('inp-wallet').required = true;
+                } else {
+                    document.getElementById('inp-wallet').required = false;
+                }
                 document.getElementById('inp-cat').required = (mode === 'op');
             },
 
@@ -283,10 +255,26 @@
             tryEnterPersonal: () => { const m = document.getElementById('modal-auth'); m.style.display = 'block'; document.getElementById('inp-pass').value = ''; document.getElementById('inp-pass').focus(); setTimeout(()=>m.classList.add('modal-open'),10); },
             checkPass: () => { if(document.getElementById('inp-pass').value === 'jmmaldo2026') { document.getElementById('modal-auth').classList.remove('modal-open'); setTimeout(()=>document.getElementById('modal-auth').style.display='none',300); app.selectAccount('personal'); } else { alert("Incorrecto"); document.getElementById('inp-pass').value = ''; } },
 
-            // --- ACTIVOS ---
+            // --- ACTIVOS (PERSONAL Y COMÚN) ---
             fetchBitcoin: async () => { try { const r=await fetch('https://api.coingecko.com/api/v3/simple/price?ids=bitcoin&vs_currencies=eur'); const d=await r.json(); if(d.bitcoin) { app.state.assets.btc_price=d.bitcoin.eur; app.updateAssetUI(); document.getElementById('btc-dot').style.display='block'; } } catch(e){} },
-            loadAssets: () => { const s = localStorage.getItem(`assets_${app.state.userID}`); if(s) app.state.assets = { ...app.state.assets, ...JSON.parse(s) }; },
-            saveAssets: () => { const t = { ...app.state.assets }; delete t.btc_price; localStorage.setItem(`assets_${app.state.userID}`, JSON.stringify(t)); app.updateAssetUI(); },
+            loadAssets: () => {
+                // Cargar saldos personales
+                const s = localStorage.getItem(`assets_${app.state.userID}`);
+                if(s) app.state.assets = { ...app.state.assets, ...JSON.parse(s) };
+                // Cargar saldo común (Ahora se guarda aquí también para consistencia)
+                const c = localStorage.getItem(`bal_${app.state.userID}_comun`);
+                if(c) app.state.balanceComun = parseFloat(c);
+            },
+            saveAssets: () => {
+                const toSave = { ...app.state.assets }; delete toSave.btc_price;
+                localStorage.setItem(`assets_${app.state.userID}`, JSON.stringify(toSave));
+                app.updateAssetUI();
+            },
+            saveComun: () => {
+                localStorage.setItem(`bal_${app.state.userID}_comun`, app.state.balanceComun);
+                if(app.state.account === 'comun') document.getElementById('total-balance').innerText = app.formatMoney(app.state.balanceComun);
+            },
+            
             editAsset: (type) => { 
                 let v; 
                 if(type==='bitcoin') { v=prompt("BTC Cantidad:", app.state.assets.btc_qty); if(v && !isNaN(v)) { app.state.assets.btc_qty=parseFloat(v); app.saveAssets(); } } 
@@ -310,9 +298,20 @@
 
             selectAccount: (type) => {
                 app.state.account = type; const root = document.documentElement;
-                if(type === 'personal') { root.style.setProperty('--accent', '#007AFF'); document.getElementById('personal-assets').style.display = 'grid'; document.getElementById('row-wallet').style.display = 'flex'; app.updateAssetUI(); } 
-                else { root.style.setProperty('--accent', '#5856D6'); document.getElementById('personal-assets').style.display = 'none'; document.getElementById('row-wallet').style.display = 'none'; const k = `bal_${app.state.userID}_comun`; app.state.balanceComun = parseFloat(localStorage.getItem(k)) || 0; }
-                document.getElementById('view-selector').classList.remove('active'); document.getElementById('view-dashboard').classList.add('active'); app.toggleTab('list'); app.loadData();
+                if(type === 'personal') { 
+                    root.style.setProperty('--accent', '#007AFF'); 
+                    document.getElementById('personal-assets').style.display = 'grid'; 
+                    document.getElementById('row-wallet').style.display = 'flex';
+                    app.updateAssetUI(); 
+                } else { 
+                    root.style.setProperty('--accent', '#5856D6'); 
+                    document.getElementById('personal-assets').style.display = 'none'; 
+                    document.getElementById('row-wallet').style.display = 'none';
+                    document.getElementById('total-balance').innerText = app.formatMoney(app.state.balanceComun);
+                }
+                document.getElementById('view-selector').classList.remove('active'); 
+                document.getElementById('view-dashboard').classList.add('active'); 
+                app.toggleTab('list'); app.loadData();
             },
             goBack: () => { if(app.state.unsub) app.state.unsub(); document.getElementById('view-dashboard').classList.remove('active'); document.getElementById('view-selector').classList.add('active'); },
             openSettings: () => { app.renderSettings(); document.getElementById('view-settings').classList.add('active'); },
@@ -327,8 +326,11 @@
                 if(app.state.account==='personal') q=q.where("type","==","personal"); else q=q.where("type","==","comun");
                 app.state.unsub = q.onSnapshot(snap => {
                     document.getElementById('wrapper-list').innerHTML = '';
-                    let totC = app.state.balanceComun; let arr = [];
-                    if(snap.empty && app.state.account==='comun') document.getElementById('total-balance').innerText = app.formatMoney(totC);
+                    let arr = [];
+                    if(snap.empty) {
+                        document.getElementById('wrapper-list').innerHTML = '<div class="empty-state">Sin movimientos</div>';
+                        return;
+                    }
                     snap.forEach(d => { let x=d.data(); x.id=d.id; arr.push(x); });
                     arr.sort((a,b) => new Date(b.date) - new Date(a.date));
                     app.state.transactions = arr;
@@ -339,14 +341,12 @@
                             color = 'black'; icon = 'fa-exchange-alt'; sign = '';
                         } else {
                             const isExp = !!app.state.cats[app.state.account].gastos[t.category];
-                            if(app.state.account==='comun') { if(isExp) totC -= t.amount; else totC += t.amount; }
                             name = app.state.cats[app.state.account].ingresos[t.category] || app.state.cats[app.state.account].gastos[t.category] || t.category;
                             color = isExp?'red':'green'; icon = 'fa-tag'; sign = isExp?'-':'+';
                         }
                         const html = `<div class="tx-row" onclick="app.askDelete('${t.id}')"><div style="display:flex; align-items:center;"><div class="tx-icon"><i class="fas ${icon}"></i></div><div><div style="font-weight:600;">${name}</div><div style="font-size:13px; color:#999;">${t.concept||t.date}</div></div></div><div class="tx-amount ${color}">${sign} ${t.amount} €</div></div>`;
                         document.getElementById('wrapper-list').insertAdjacentHTML('beforeend', html);
                     });
-                    if(app.state.account==='comun') { document.getElementById('total-balance').innerText = app.formatMoney(totC); document.getElementById('total-balance').onclick = () => app.editBalance(); } else { document.getElementById('total-balance').onclick = null; }
                     if(document.getElementById('charts-wrapper').style.display==='block') app.renderChart();
                 });
             },
@@ -364,7 +364,6 @@
                     const to = document.getElementById('inp-to').value;
                     if(from === to) return alert("Origen y destino deben ser diferentes");
                     
-                    // Actualizar Saldos
                     app.state.assets[from] -= amt;
                     app.state.assets[to] += amt;
                     app.saveAssets();
@@ -376,16 +375,27 @@
                     }).then(() => { app.forceClose(); e.target.reset(); });
 
                 } else {
-                    // Lógica NORMAL
+                    // Lógica NORMAL (GASTO/INGRESO)
                     const cat = document.getElementById('inp-cat').value;
-                    const wallet = document.getElementById('inp-wallet').value;
-                    if(app.state.account === 'personal' && wallet !== 'none') {
+                    
+                    // PERSONAL: Afecta a Assets específicos
+                    if(app.state.account === 'personal') {
+                        const wallet = document.getElementById('inp-wallet').value;
+                        if(!wallet) return alert("Debes seleccionar una cuenta");
+                        
                         const isExp = !!app.state.cats[app.state.account].gastos[cat];
                         if(app.state.assets[wallet] !== undefined) {
                             if(isExp) app.state.assets[wallet] -= amt; else app.state.assets[wallet] += amt;
                             app.saveAssets();
                         }
+                    } 
+                    // COMÚN: Afecta al Saldo Común
+                    else {
+                        const isExp = !!app.state.cats[app.state.account].gastos[cat];
+                        if(isExp) app.state.balanceComun -= amt; else app.state.balanceComun += amt;
+                        app.saveComun();
                     }
+
                     db.collection("transactions").add({
                         uid: app.state.userID, type: app.state.account, amount: amt, category: cat,
                         concept: desc, date: date, timestamp: Date.now()
@@ -394,7 +404,12 @@
             },
 
             askDelete: (id) => { if(confirm("¿Borrar?")) db.collection("transactions").doc(id).delete(); },
-            editBalance: () => { const v = prompt("Saldo Inicial (Común):", app.state.balanceComun); if(v&&!isNaN(v)) { localStorage.setItem(`bal_${app.state.userID}_comun`, v); app.state.balanceComun=parseFloat(v); app.loadData(); } },
+            editBalance: () => { 
+                if(app.state.account === 'comun') {
+                    const v = prompt("Ajustar Saldo Común:", app.state.balanceComun);
+                    if(v && !isNaN(v)) { app.state.balanceComun=parseFloat(v); app.saveComun(); } 
+                }
+            },
             
             renderChart: () => {
                 const ctx = document.getElementById('chart-canvas').getContext('2d');
@@ -410,12 +425,20 @@
             },
 
             openModal: () => {
-                app.switchModalMode('op'); // Reset a Operación
+                app.switchModalMode('op');
                 const s = document.getElementById('inp-cat'); s.innerHTML = '<option disabled selected>Seleccionar</option>';
                 const c = app.state.cats[app.state.account];
                 let g1 = document.createElement('optgroup'); g1.label="INGRESOS"; for(const [k,v] of Object.entries(c.ingresos)) { let o=document.createElement('option'); o.value=k; o.text=v; g1.appendChild(o); } s.appendChild(g1);
                 let g2 = document.createElement('optgroup'); g2.label="GASTOS"; for(const [k,v] of Object.entries(c.gastos)) { let o=document.createElement('option'); o.value=k; o.text=v; g2.appendChild(o); } s.appendChild(g2);
-                document.getElementById('inp-wallet').value = 'none';
+                
+                // Mostrar/Ocultar selector de cuenta según si es personal o común
+                if(app.state.account === 'personal') {
+                    document.getElementById('row-wallet').style.display = 'flex';
+                    document.getElementById('inp-wallet').value = ''; // Reset
+                } else {
+                    document.getElementById('row-wallet').style.display = 'none';
+                }
+
                 const m = document.getElementById('modal'); m.style.display = 'block';
                 document.getElementById('inp-date').valueAsDate = new Date();
                 setTimeout(()=>m.classList.add('modal-open'),10);
